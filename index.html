@@ -266,9 +266,9 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 .resize-handle:hover { background:var(--accent); opacity:.4; }
 
 /* ===== SLIDE CANVAS LAYOUT ===== */
-.s-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-shrink:0}
+.s-hdr{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-shrink:0}
 .s-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:0;overflow:hidden}
-.s-ftr{flex-shrink:0;margin-top:auto;padding-top:6px;display:flex;justify-content:space-between;align-items:center}
+.s-ftr{flex-shrink:0;margin-top:auto;padding-top:6px;display:flex;align-items:center;gap:6px}
 .auth-overlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .auth-brand{font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:6px;color:#c76a25;text-transform:uppercase}
 .auth-sub{font-family:'DM Sans',sans-serif;font-size:11px;color:#555;margin-top:-6px}
@@ -321,26 +321,35 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
       <div><label class="lbl">Background</label><input type="color" id="bk-bg" value="#141414" oninput="BK.background=this.value" style="width:100%;height:24px;border:1px solid var(--border2);border-radius:4px;background:none;cursor:pointer;padding:1px"></div>
       <div><label class="lbl">Text</label><input type="color" id="bk-text" value="#f0ece4" oninput="BK.text=this.value" style="width:100%;height:24px;border:1px solid var(--border2);border-radius:4px;background:none;cursor:pointer;padding:1px"></div>
     </div>
-    <label class="lbl">Logo</label>
-    <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
-      <button class="btn bg" style="font-size:8px;flex:1" onclick="uploadBrandLogo()" id="bk-logo-btn">Upload Logo</button>
-      <button class="btn bg" style="font-size:8px;padding:5px 8px" onclick="BK.logoData='';document.getElementById('bk-logo-preview').style.display='none';document.getElementById('bk-logo-btn').textContent='Upload Logo';renderCanvas()">Clear</button>
-    </div>
-    <div id="bk-logo-preview" style="display:none;margin-bottom:6px;text-align:center"><img id="bk-logo-img" style="max-height:40px;max-width:100%;border-radius:4px;border:1px solid var(--border)"></div>
     <div class="frow" style="margin-bottom:6px">
-      <div>
-        <label class="lbl">Position</label>
-        <select class="theme-sel" id="bk-pos" style="width:100%" onchange="BK.logoPos=this.value;renderCanvas()">
-          <option value="bottom-left">Bottom left</option>
-          <option value="bottom-right">Bottom right</option>
-          <option value="top-left">Top left</option>
-          <option value="top-right">Top right</option>
-        </select>
+      <div style="flex:1">
+        <label class="lbl">Dark bg logo</label>
+        <button class="btn bg" style="font-size:7.5px;width:100%;padding:5px 6px" onclick="uploadBrandLogoVariant('Dark')" id="bk-logo-dark-btn">Upload</button>
+        <div id="bk-logo-dark-preview" style="display:none;margin-top:4px;text-align:center"><img id="bk-logo-dark-img" style="max-height:28px;max-width:100%;border-radius:3px;border:1px solid var(--border)"></div>
       </div>
-      <div>
-        <label class="lbl">Size (px)</label>
-        <input class="fi" type="number" id="bk-size" min="16" max="80" value="32" oninput="BK.logoSize=parseInt(this.value)||32;renderCanvas()" style="margin:0;padding:5px 8px">
+      <div style="flex:1">
+        <label class="lbl">Light bg logo</label>
+        <button class="btn bg" style="font-size:7.5px;width:100%;padding:5px 6px" onclick="uploadBrandLogoVariant('Light')" id="bk-logo-light-btn">Upload</button>
+        <div id="bk-logo-light-preview" style="display:none;margin-top:4px;text-align:center"><img id="bk-logo-light-img" style="max-height:28px;max-width:100%;border-radius:3px;border:1px solid var(--border)"></div>
       </div>
+      <div style="display:flex;align-items:flex-end;padding-bottom:2px"><button class="btn bg" style="font-size:7px;padding:4px 6px" onclick="BK.logoDataDark='';BK.logoDataLight='';initBrandKitUI();renderCanvas()">Clear</button></div>
+    </div>
+    <div style="margin-bottom:6px">
+      <label class="lbl">Position</label>
+      <select class="theme-sel" id="bk-pos" style="width:100%" onchange="BK.logoPos=this.value;renderCanvas()">
+        <option value="bottom-left">Bottom left</option>
+        <option value="bottom-right">Bottom right</option>
+        <option value="top-left">Top left</option>
+        <option value="top-right">Top right</option>
+      </select>
+    </div>
+    <div style="margin-bottom:4px">
+      <label class="lbl" id="bk-size-lbl">Size 40px</label>
+      <input type="range" id="bk-size" min="8" max="120" step="2" value="40" style="width:100%" oninput="BK.logoSize=parseInt(this.value);document.getElementById('bk-size-lbl').textContent='Size '+this.value+'px';renderCanvas()">
+    </div>
+    <div style="margin-bottom:6px">
+      <label class="lbl" id="bk-opacity-lbl">Opacity 100%</label>
+      <input type="range" id="bk-opacity" min="10" max="100" step="5" value="100" style="width:100%" oninput="BK.logoOpacity=parseInt(this.value);document.getElementById('bk-opacity-lbl').textContent='Opacity '+this.value+'%';renderCanvas()">
     </div>
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><input type="checkbox" id="bk-all" checked onchange="BK.showOnAll=this.checked;renderCanvas()"><label for="bk-all" class="lbl" style="margin:0">Show logo on all slides</label></div>
     <div style="display:flex;gap:5px">
@@ -355,6 +364,32 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
     <input class="fi" id="f-handle" value="Your Name &middot; Your Title" oninput="S.handle=this.value;renderCanvas()">
     <label class="lbl">Category tag</label>
     <input class="fi" id="f-tag" value="Your Brand" oninput="S.tag=this.value;renderCanvas()">
+    <div class="frow" style="margin-top:8px">
+      <div>
+        <label class="lbl">Counter size (px)</label>
+        <input class="fi" type="number" id="f-counter-size" min="7" max="14" value="9" oninput="S.counterFontSize=parseInt(this.value)||9;renderCanvas()" style="margin:0;padding:5px 8px;width:100%">
+      </div>
+      <div>
+        <label class="lbl">Slide progress</label>
+        <select class="theme-sel" id="f-swipe-style" style="width:100%" onchange="S.swipeStyle=this.value;document.getElementById('f-swipe-custom-wrap').style.display=this.value==='custom'?'block':'none';renderCanvas()">
+          <option value="swipe">SWIPE &rarr;</option>
+          <option value="arrows">&rarr; &rarr;</option>
+          <option value="dots">Progress dots</option>
+          <option value="none">None</option>
+          <option value="custom">Custom text</option>
+        </select>
+      </div>
+    </div>
+    <div id="f-swipe-custom-wrap" style="display:none;margin-top:4px">
+      <label class="lbl">Custom text</label>
+      <input class="fi" id="f-swipe-custom" placeholder="e.g. Next slide..." oninput="S.swipeCustomText=this.value;renderCanvas()">
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="f-show-tag" checked onchange="S.showTag=this.checked;renderCanvas()"><label for="f-show-tag" class="lbl" style="margin:0">Tag</label></div>
+      <div style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="f-show-counter" checked onchange="S.showCounter=this.checked;renderCanvas()"><label for="f-show-counter" class="lbl" style="margin:0">Counter</label></div>
+      <div style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="f-show-footer" checked onchange="S.showFooter=this.checked;renderCanvas()"><label for="f-show-footer" class="lbl" style="margin:0">Footer</label></div>
+      <div style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="f-show-swipe" checked onchange="S.showSwipe=this.checked;renderCanvas()"><label for="f-show-swipe" class="lbl" style="margin:0">Progress</label></div>
+    </div>
   </div>
 
   <div class="psec">
@@ -668,6 +703,13 @@ let S = {
   font:'Playfair Display',
   cur:0,
   caption:'',
+  counterFontSize:9,
+  swipeStyle:'swipe',
+  swipeCustomText:'',
+  showTag:true,
+  showCounter:true,
+  showFooter:true,
+  showSwipe:true,
   hashtagSets:[
     {name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},
     {name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},
@@ -696,8 +738,8 @@ let S = {
 let GS = {c1:'#c76a25', c2:'#facb67', c3:'#7a1c1c', dir:'radial', opacity:22};
 
 // ==================== BRAND KIT ====================
-let BK = {primary:'#c76a25', secondary:'#facb67', background:'#141414', text:'#f0ece4', logoData:'', logoPos:'bottom-left', logoSize:32, showOnAll:true};
-function loadBK(){try{const s=localStorage.getItem('postcanvas-brand-kit');if(s){BK={...BK,...JSON.parse(s)};}}catch{}}
+let BK = {primary:'#c76a25', secondary:'#facb67', background:'#141414', text:'#f0ece4', logoDataDark:'', logoDataLight:'', logoPos:'bottom-left', logoSize:40, logoOpacity:100, showOnAll:true};
+function loadBK(){try{const s=localStorage.getItem('postcanvas-brand-kit');if(s){const d=JSON.parse(s);BK={...BK,...d};if(d.logoData&&!d.logoDataDark){BK.logoDataDark=d.logoData;delete BK.logoData;}}}catch{}}
 function saveBK(){localStorage.setItem('postcanvas-brand-kit',JSON.stringify(BK));toast('Brand Kit saved');}
 loadBK();
 
@@ -839,19 +881,16 @@ function applyGlowPreset(c1,c2,c3,dir,op) {
 }
 
 // ==================== BRAND KIT FUNCTIONS ====================
-function uploadBrandLogo() {
+function uploadBrandLogoVariant(variant) {
+  const key=variant==='Dark'?'logoDataDark':'logoDataLight';
   const input=document.createElement('input');
   input.type='file';input.accept='image/*';
   input.onchange=()=>{
     const file=input.files[0];if(!file) return;
     const reader=new FileReader();
     reader.onload=(e)=>{
-      BK.logoData=e.target.result;
-      const prev=document.getElementById('bk-logo-preview');
-      const img=document.getElementById('bk-logo-img');
-      if(prev&&img){prev.style.display='block';img.src=BK.logoData;}
-      document.getElementById('bk-logo-btn').textContent='\u2713 Replace Logo';
-      renderCanvas();toast('Logo uploaded');
+      BK[key]=e.target.result;
+      initBrandKitUI();renderCanvas();toast(variant+' logo uploaded');
     };
     reader.readAsDataURL(file);
   };
@@ -884,13 +923,20 @@ function initBrandKitUI() {
   document.getElementById('bk-text').value=BK.text;
   document.getElementById('bk-pos').value=BK.logoPos;
   document.getElementById('bk-size').value=BK.logoSize;
+  document.getElementById('bk-size-lbl').textContent='Size '+BK.logoSize+'px';
+  document.getElementById('bk-opacity').value=BK.logoOpacity;
+  document.getElementById('bk-opacity-lbl').textContent='Opacity '+BK.logoOpacity+'%';
   document.getElementById('bk-all').checked=BK.showOnAll;
-  if(BK.logoData) {
-    const prev=document.getElementById('bk-logo-preview');
-    const img=document.getElementById('bk-logo-img');
-    if(prev&&img){prev.style.display='block';img.src=BK.logoData;}
-    document.getElementById('bk-logo-btn').textContent='\u2713 Replace Logo';
-  }
+  // Dark logo preview
+  const dPrev=document.getElementById('bk-logo-dark-preview');
+  const dImg=document.getElementById('bk-logo-dark-img');
+  if(BK.logoDataDark){dPrev.style.display='block';dImg.src=BK.logoDataDark;document.getElementById('bk-logo-dark-btn').textContent='\u2713 Replace';}
+  else{dPrev.style.display='none';document.getElementById('bk-logo-dark-btn').textContent='Upload';}
+  // Light logo preview
+  const lPrev=document.getElementById('bk-logo-light-preview');
+  const lImg=document.getElementById('bk-logo-light-img');
+  if(BK.logoDataLight){lPrev.style.display='block';lImg.src=BK.logoDataLight;document.getElementById('bk-logo-light-btn').textContent='\u2713 Replace';}
+  else{lPrev.style.display='none';document.getElementById('bk-logo-light-btn').textContent='Upload';}
 }
 
 // ==================== BG ENGINE ====================
@@ -1168,18 +1214,53 @@ function buildSlide(slide,idx,total,font) {
   const hlAccent=slide.accentOverride||A;
   const hlHTML=hl(slide.headline||'',slide.accent||'',hlAccent,hlFont);
   const handle=S.handle, tag=S.tag;
-  const swipe=idx<total-1?'swipe \u2192':'';
 
   const isLinenTut=themeKey==='linen-tutorial';
   const isBreaking=themeKey==='breaking';
   const isTechDark=themeKey==='tech-dark';
+  const isLightTheme=LIGHT_THEMES.includes(themeKey);
+
+  // Brand logo — pick dark or light variant
+  let logoSrc='';
+  if(BK.showOnAll) {
+    logoSrc=isLightTheme?(BK.logoDataLight||BK.logoDataDark):(BK.logoDataDark||BK.logoDataLight);
+  }
+  const logoSz=BK.logoSize||40;
+  const logoOp=BK.logoOpacity!=null?BK.logoOpacity:100;
+  const logoPos=BK.logoPos||'bottom-left';
+  const logoIsTop=logoPos==='top-left'||logoPos==='top-right';
+  const logoIsRight=logoPos==='top-right'||logoPos==='bottom-right';
+  const logoImgStyle=`height:${logoSz}px;width:auto;object-fit:contain;opacity:${logoOp/100};flex-shrink:0`;
+  const logoEl=logoSrc?`<img src="${logoSrc}" style="${logoImgStyle}">`:'';
+
+  // Swipe / progress indicator
+  let swipeHTML='';
+  if(S.showSwipe!==false&&idx<total-1) {
+    const ss=S.swipeStyle||'swipe';
+    if(ss==='swipe') swipeHTML=`<span style="font-family:${mono};font-size:8px;color:${T3};text-transform:uppercase;letter-spacing:1px">swipe \u2192</span>`;
+    else if(ss==='arrows') swipeHTML=`<span style="font-family:${mono};font-size:10px;color:${T3}">\u2192 \u2192</span>`;
+    else if(ss==='dots') {
+      let dots='';for(let di=0;di<total;di++){dots+=`<circle cx="${6+di*10}" cy="4" r="3" fill="${di===idx?A:T3}" opacity="${di===idx?1:0.35}"/>`;}
+      swipeHTML=`<svg width="${total*10+2}" height="8" xmlns="http://www.w3.org/2000/svg">${dots}</svg>`;
+    }
+    else if(ss==='custom') swipeHTML=`<span style="font-family:${mono};font-size:8px;color:${T3};text-transform:uppercase;letter-spacing:1px">${S.swipeCustomText||''}</span>`;
+    // 'none' leaves swipeHTML empty
+  }
 
   // Header tag element
-  const tagEl=isLinenTut
+  const tagEl=S.showTag!==false?(isLinenTut
     ?`<div style="display:inline-block;border:1.5px solid ${A};border-radius:20px;padding:3px 10px;font-family:${mono};font-size:8px;letter-spacing:2px;color:${A};text-transform:uppercase">${tag}</div>`
     :isBreaking
     ?`<div style="display:inline-flex;align-items:center;gap:6px;border:1.5px solid ${A};border-radius:20px;padding:3px 10px;font-family:${mono};font-size:8px;letter-spacing:1.5px;color:${TX};text-transform:uppercase"><span style="width:7px;height:7px;border-radius:50%;background:#e84040;display:inline-block;flex-shrink:0"></span>${tag}</div>`
-    :`<span style="font-family:${mono};font-size:8.5px;letter-spacing:2px;color:${t.tagC};text-transform:uppercase">${tag}</span>`;
+    :`<span style="font-family:${mono};font-size:8.5px;letter-spacing:2px;color:${t.tagC};text-transform:uppercase">${tag}</span>`):'';
+
+  // Counter element (uses tagC instead of ctrC for visibility)
+  const ctrFs=S.counterFontSize||9;
+  const counterEl=S.showCounter!==false?`<span style="font-family:${mono};font-size:${ctrFs}px;color:${t.tagC}">${idx+1} / ${total}</span>`:'';
+
+  // Header row: [tag] [spacer] [logo if top] [counter]
+  const hdrLogo=(logoEl&&logoIsTop)?`${logoIsRight?'':logoEl}<div style="flex:1"></div>${logoIsRight?logoEl:''}`:`<div style="flex:1"></div>`;
+  const hdrHTML=`<div class="s-hdr">${tagEl}${hdrLogo}${counterEl}</div>`;
 
   // Headline style (tech-dark uses gradient)
   const hlClass=isTechDark?'class="hl-gradient"':'';
@@ -1192,28 +1273,21 @@ function buildSlide(slide,idx,total,font) {
 
   const padding=isLinenTut?'20px 22px 14px':'26px 26px 16px';
 
-  // Brand logo
-  let logoHTML='';
-  if(BK.logoData&&BK.showOnAll) {
-    const sz=BK.logoSize||32;
-    const pos=BK.logoPos||'bottom-left';
-    const posStyle=pos==='bottom-left'?'bottom:14px;left:16px':pos==='bottom-right'?'bottom:14px;right:16px':pos==='top-left'?'top:14px;left:16px':'top:14px;right:16px';
-    logoHTML=`<img src="${BK.logoData}" style="position:absolute;${posStyle};height:${sz}px;width:auto;object-fit:contain;z-index:5;pointer-events:none">`;
-  }
+  // Footer row: [handle] [spacer] [logo if bottom] [swipe]
+  const ftrLogo=(logoEl&&!logoIsTop)?`${logoIsRight?'':logoEl}<div style="flex:1"></div>${logoIsRight?logoEl:''}`:`<div style="flex:1"></div>`;
+  const footerLeft=S.showFooter!==false?`<div style="font-family:${mono};font-size:8px;color:${T3};line-height:1.5">LinkedIn<br><span style="color:${T2}">${handle}</span></div>`:'';
+  const ftrHTML=`<div class="s-ftr" style="border-top:1px solid ${FB}">${footerLeft}${ftrLogo}${swipeHTML}</div>`;
 
   return `
     <div class="sbg" style="background:${t.bg}"><div style="position:absolute;inset:0;overflow:hidden">${bgSVG}</div></div>
     <div class="scont" style="padding:${padding}">
-      <div class="s-hdr">${tagEl}<span style="font-family:${mono};font-size:9px;color:${t.ctrC}">${idx+1} / ${total}</span></div>
+      ${hdrHTML}
       <div class="s-body">
         <div ${hlClass} style="${hlStyle}">${hlHTML}</div>
         ${blocksHTML}
       </div>
-      <div class="s-ftr" style="border-top:1px solid ${FB}">
-        <div style="font-family:${mono};font-size:8px;color:${T3};line-height:1.5">LinkedIn<br><span style="color:${T2}">${handle}</span></div>
-        <div style="font-family:${mono};font-size:8px;color:${T3};text-transform:uppercase;letter-spacing:1px">${swipe}</div>
-      </div>
-    </div>${logoHTML}`;
+      ${ftrHTML}
+    </div>`;
 }
 
 // ==================== RENDER ====================
@@ -1956,13 +2030,24 @@ function handleImportJSON(input) {
         S.checklist=[false,false,false,false,false];
         if(!S.hashtagSets) S.hashtagSets=[{name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},{name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},{name:'Business',tags:'#SmallBusiness #Entrepreneurship #BusinessGrowth #AustralianBusiness'}];
         const capTa=document.getElementById('cap-text');if(capTa) capTa.value=S.caption||'';
-        initThemeGrid();renderAll();
+        syncProfileUI();initThemeGrid();renderAll();
         toast('Draft imported: '+(data.name||file.name));
       } else {toast('Invalid draft file',true);}
     } catch(err){toast('Could not read file: '+err.message,true);}
   };
   reader.readAsText(file);
   input.value='';
+}
+
+function syncProfileUI() {
+  document.getElementById('f-counter-size').value=S.counterFontSize||9;
+  const swSel=document.getElementById('f-swipe-style');if(swSel)swSel.value=S.swipeStyle||'swipe';
+  document.getElementById('f-swipe-custom-wrap').style.display=(S.swipeStyle==='custom')?'block':'none';
+  const swCust=document.getElementById('f-swipe-custom');if(swCust)swCust.value=S.swipeCustomText||'';
+  document.getElementById('f-show-tag').checked=S.showTag!==false;
+  document.getElementById('f-show-counter').checked=S.showCounter!==false;
+  document.getElementById('f-show-footer').checked=S.showFooter!==false;
+  document.getElementById('f-show-swipe').checked=S.showSwipe!==false;
 }
 
 // ==================== DRAFT MANAGEMENT ====================
@@ -1996,7 +2081,7 @@ function loadDraft(idx) {
   S.checklist=[false,false,false,false,false];
   if(!S.hashtagSets) S.hashtagSets=[{name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},{name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},{name:'Business',tags:'#SmallBusiness #Entrepreneurship #BusinessGrowth #AustralianBusiness'}];
   const capTa=document.getElementById('cap-text');if(capTa) capTa.value=S.caption||'';
-  initThemeGrid();renderAll();toast('Loaded: '+saved.name);
+  syncProfileUI();initThemeGrid();renderAll();toast('Loaded: '+saved.name);
 }
 
 function delDraft(idx,ev) {
