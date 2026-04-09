@@ -108,10 +108,29 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;hei
 .theme-sel{font-family:'JetBrains Mono',monospace;font-size:8px;background:var(--bg);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:4px 6px;cursor:pointer}
 .theme-sel:focus{border-color:var(--accent)}
 .theme-sel option{background:var(--bg2);color:var(--text)}
+.auth-overlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.auth-brand{font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:6px;color:#c76a25;text-transform:uppercase}
+.auth-sub{font-family:'DM Sans',sans-serif;font-size:11px;color:#555;margin-top:-6px}
+.auth-input{width:260px;background:#111;border:1px solid #2a2a2a;border-radius:4px;color:#e0dcd5;font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;text-align:center}
+.auth-input:focus{border-color:#c76a25}
+.auth-input.shake{animation:authShake .4s}
+.auth-btn{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 28px;border-radius:4px;cursor:pointer;border:none;background:#c76a25;color:#fff;transition:background .15s}
+.auth-btn:hover{background:#e07a30}
+.auth-err{font-family:'JetBrains Mono',monospace;font-size:9px;color:#aa5a5a;height:14px}
+@keyframes authShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 </style>
 </head>
 <body>
 
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-brand">&#9670; PostCanvas</div>
+  <div class="auth-sub">By Abnaasi Pty Ltd</div>
+  <input class="auth-input" id="auth-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')authCheck()">
+  <button class="auth-btn" onclick="authCheck()">Enter</button>
+  <div class="auth-err" id="auth-err"></div>
+</div>
+
+<div id="studio-wrap" style="display:none;flex-direction:column;height:100vh">
 <div class="topbar">
   <div class="brand">&#9670; PostCanvas</div>
   <div class="tb-r">
@@ -287,6 +306,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;hei
   <div class="prog-label" style="font-size:9px;opacity:.5">Please wait</div>
 </div>
 <div class="toast" id="toast"></div>
+</div>
 
 <script>
 // ==================== THEMES ====================
@@ -1232,9 +1252,33 @@ document.addEventListener('keydown',e=>{
   if(e.key==='e'||e.key==='E') exportCurrentSlide();
 });
 
+// ==================== AUTH GATE ====================
+function authCheck() {
+  const pw=document.getElementById('auth-pw').value;
+  if(pw==='Abn@@512026') {
+    sessionStorage.setItem('postcanvas-auth','1');
+    document.getElementById('auth-overlay').style.display='none';
+    document.getElementById('studio-wrap').style.display='flex';
+    initThemeGrid();renderAll();
+  } else {
+    const inp=document.getElementById('auth-pw');
+    const err=document.getElementById('auth-err');
+    err.textContent='Incorrect password';
+    inp.classList.add('shake');
+    inp.value='';
+    setTimeout(()=>{inp.classList.remove('shake');},400);
+    setTimeout(()=>{err.textContent='';},2000);
+  }
+}
+
 // ==================== INIT ====================
-initThemeGrid();
-renderAll();
+if(sessionStorage.getItem('postcanvas-auth')==='1') {
+  document.getElementById('auth-overlay').style.display='none';
+  document.getElementById('studio-wrap').style.display='flex';
+  initThemeGrid();renderAll();
+} else {
+  document.getElementById('auth-pw').focus();
+}
 </script>
 </body>
 </html>
