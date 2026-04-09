@@ -34,7 +34,7 @@ Deploy to GitHub Pages:
 1. Push this repo to GitHub
 2. Go to Settings > Pages
 3. Set source to "Deploy from a branch" > main > / (root)
-4. Access at `https://[username].github.io/postcanvas/`
+4. Access at `https://Abnaasi-Pty-Ltd.github.io/postcanvas/`
 
 ## No Dependencies
 
