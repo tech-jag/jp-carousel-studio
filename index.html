@@ -217,6 +217,50 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 .toast.on { opacity:1; transform:translateY(0); }
 .toast.err { background:#3a1e1e; border-color:#6a3a3a; color:#cc7a7a; }
 
+/* ===== CAPTION EDITOR ===== */
+.cap-textarea { width:100%; min-height:200px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; line-height:1.7; padding:10px; outline:none; resize:vertical; transition:border-color .15s; }
+.cap-textarea:focus { border-color:var(--accent); }
+.cap-toolbar { display:flex; gap:4px; margin-bottom:6px; }
+.cap-tbtn { width:28px; height:28px; border-radius:var(--radius-sm); background:var(--bg3); border:1px solid var(--border2); color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; transition:all .15s; font-family:'DM Sans',sans-serif; }
+.cap-tbtn:hover { border-color:var(--accent); color:var(--accent); }
+.cap-emoji-row { display:flex; flex-wrap:wrap; gap:3px; margin-top:6px; }
+.cap-emoji { width:28px; height:28px; border-radius:var(--radius-sm); background:var(--bg3); border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; transition:all .15s; }
+.cap-emoji:hover { border-color:var(--accent); transform:scale(1.1); }
+.cap-counter { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text3); text-align:right; margin-top:4px; }
+.cap-counter.warn { color:var(--accent); }
+.cap-counter.over { color:#e05050; }
+.cap-btns { display:flex; gap:6px; margin-top:8px; }
+
+/* ===== HASHTAG MANAGER ===== */
+.htag-set { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
+.htag-pill { font-family:'JetBrains Mono',monospace; font-size:9px; padding:4px 10px; border-radius:20px; background:var(--bg); border:1px solid var(--border2); color:var(--text3); cursor:pointer; transition:all .15s; }
+.htag-pill:hover { border-color:var(--accent); color:var(--accent); }
+.htag-del { font-size:10px; color:var(--text3); cursor:pointer; margin-left:3px; }
+.htag-del:hover { color:#e05050; }
+.htag-add-row { display:flex; gap:4px; margin-top:6px; }
+
+/* ===== CHECKLIST ===== */
+.check-item { display:flex; align-items:flex-start; gap:8px; padding:6px 0; cursor:pointer; transition:color .15s; }
+.check-item:hover { color:var(--text); }
+.check-box { width:18px; height:18px; border-radius:3px; border:2px solid var(--border2); background:var(--bg3); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all .15s; margin-top:1px; }
+.check-item.checked .check-box { background:var(--green); border-color:var(--green); color:#fff; }
+.check-label { font-size:12px; color:var(--text2); line-height:1.4; }
+.check-item.checked .check-label { color:var(--text3); text-decoration:line-through; }
+.check-ready { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--green); text-align:center; padding:8px; margin-top:6px; background:rgba(45,122,45,0.1); border-radius:var(--radius-sm); display:none; }
+
+/* ===== HELP MODAL ===== */
+.help-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:998; display:none; align-items:center; justify-content:center; }
+.help-overlay.on { display:flex; }
+.help-panel { background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); width:420px; max-height:80vh; overflow-y:auto; padding:24px; box-shadow:0 24px 64px rgba(0,0,0,.5); }
+.help-panel h3 { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin:16px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.help-panel h3:first-child { margin-top:0; }
+.help-row { display:flex; justify-content:space-between; padding:4px 0; font-size:12px; }
+.help-key { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); font-weight:600; }
+.help-desc { color:var(--text2); }
+.help-text { font-size:12px; color:var(--text2); line-height:1.7; margin-bottom:8px; }
+.help-text b { color:var(--text); }
+.help-text a { color:var(--accent); text-decoration:none; }
+
 /* ===== RESIZE HANDLE ===== */
 .resize-handle { position:absolute; right:0; top:0; bottom:0; width:5px; cursor:ew-resize; background:transparent; z-index:10; transition:background .2s; }
 .resize-handle:hover { background:var(--accent); opacity:.4; }
@@ -257,6 +301,7 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
     <button class="btn bg" onclick="importDraftJSON()" title="Load a .json draft file">Import Draft</button>
     <button class="btn exp-one" onclick="exportCurrentSlide()">Export Slide PNG</button>
     <button class="btn exp-all" onclick="exportAllSlides()">Export All PNGs</button>
+    <button class="mode-btn" onclick="toggleHelpModal()" title="Help &amp; Shortcuts">?</button>
     <a href="https://abnaasi.com" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text3);text-decoration:none;letter-spacing:1px;white-space:nowrap" title="Built by Abnaasi Pty Ltd">Built by Abnaasi</a>
     <button class="mode-btn" onclick="toggleMode()" id="mbtn" title="Dark/Light (D)">&#127769;</button>
   </div>
@@ -404,21 +449,65 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 <div class="pr">
   <div class="psec" style="padding:9px 12px"><div class="ptit">Post Brief</div></div>
   <div id="bcards"></div>
-  <div class="rbox">
-    <div class="rbtit">Research Workflow</div>
-    <div class="rbtext">1. Open Claude<br>2. Ask: <b>"Give me a [N]-slide LinkedIn carousel brief on [topic] &#8212; hook headline + accent word, stats for slide 2, bullets for slide 3, CTA keyword"</b><br>3. Paste into fields left<br><br><a href="https://claude.ai" target="_blank">&#8594; Open Claude.ai</a></div>
+
+  <div class="psec">
+    <div class="ptit">Caption Editor</div>
+    <div class="cap-toolbar">
+      <button class="cap-tbtn" onclick="capFormat('bold')" title="Bold (Unicode)"><b>B</b></button>
+      <button class="cap-tbtn" onclick="capFormat('italic')" title="Italic"><i>I</i></button>
+      <button class="cap-tbtn" onclick="capInsert('\u2022 ')" title="Bullet point">&bull;</button>
+      <button class="cap-tbtn" onclick="capInsert(String.fromCharCode(10))" title="Line break">&crarr;</button>
+    </div>
+    <textarea class="cap-textarea" id="cap-text" placeholder="Write your LinkedIn caption here..." oninput="updateCapCounter();S.caption=this.value"></textarea>
+    <div class="cap-counter" id="cap-counter">0 / 3,000</div>
+    <div class="cap-emoji-row">
+      <button class="cap-emoji" onclick="capInsert('&#x1F680;')">&#x1F680;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F4A1;')">&#x1F4A1;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F3AF;')">&#x1F3AF;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x2705;')">&#x2705;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F525;')">&#x1F525;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F447;')">&#x1F447;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F4CC;')">&#x1F4CC;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F3A4;')">&#x1F3A4;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F4C8;')">&#x1F4C8;</button>
+      <button class="cap-emoji" onclick="capInsert('&#x1F4BC;')">&#x1F4BC;</button>
+    </div>
+    <div class="cap-btns">
+      <button class="btn ba" onclick="generateCaption()" style="font-size:9px;padding:6px 10px">Generate Draft</button>
+      <button class="btn bgreen" onclick="copyCaption()" style="font-size:9px;padding:6px 10px">Copy Caption</button>
+    </div>
   </div>
-  <div class="rbox">
-    <div class="rbtit">LinkedIn Caption</div>
-    <div id="licap" class="rbtext" style="white-space:pre-wrap;font-size:9px"></div>
+
+  <div class="psec">
+    <div class="ptit">Hashtag Sets</div>
+    <div id="htag-sets"></div>
+    <div class="htag-add-row">
+      <input class="fi" id="htag-name" placeholder="Set name..." style="margin:0;flex:1;font-size:11px;padding:5px 8px">
+      <input class="fi" id="htag-tags" placeholder="#tag1 #tag2 ..." style="margin:0;flex:2;font-size:11px;padding:5px 8px">
+      <button class="btn ba" onclick="addHashtagSet()" style="font-size:8px;padding:5px 8px">+</button>
+    </div>
   </div>
-  <div class="rbox">
-    <div class="rbtit">Keyboard Shortcuts</div>
-    <div class="rbtext"><b>&#8592; &#8594;</b> Navigate slides<br><b>1-9</b> Jump to slide<br><b>S</b> Save draft<br><b>D</b> Dark/light mode<br><b>E</b> Export current slide</div>
+
+  <div class="psec">
+    <div class="ptit">Pre-Post Checklist</div>
+    <div id="checklist"></div>
+    <div class="check-ready" id="check-ready">Ready to post! &#x1F680;</div>
   </div>
-  <div class="rbox">
-    <div class="rbtit">Export Guide</div>
-    <div class="rbtext"><b>PNG Export</b> uses html2canvas &#8212; click "Export This Slide" or "Export All Slides" for 1200&#215;1200px PNGs.<br><br><b>LinkedIn:</b> Upload PNGs as a document post for max reach.</div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="help-overlay" id="help-overlay" onclick="if(event.target===this)toggleHelpModal()">
+  <div class="help-panel">
+    <h3>Keyboard Shortcuts</h3>
+    <div class="help-row"><span class="help-key">&larr; &rarr;</span><span class="help-desc">Navigate slides</span></div>
+    <div class="help-row"><span class="help-key">1 &ndash; 9</span><span class="help-desc">Jump to slide</span></div>
+    <div class="help-row"><span class="help-key">S</span><span class="help-desc">Save draft</span></div>
+    <div class="help-row"><span class="help-key">D</span><span class="help-desc">Toggle dark / light mode</span></div>
+    <div class="help-row"><span class="help-key">E</span><span class="help-desc">Export current slide as PNG</span></div>
+    <h3>Export Guide</h3>
+    <div class="help-text"><b>PNG Export</b> uses html2canvas &mdash; click "Export This Slide" or "Export All Slides" for high-res PNGs sized to your canvas.<br><br><b>LinkedIn:</b> Upload PNGs as a document post for maximum reach. Recommended: 4&ndash;8 slides.</div>
+    <h3>Research Workflow</h3>
+    <div class="help-text">1. Open <a href="https://claude.ai" target="_blank">Claude.ai</a><br>2. Ask: <b>&ldquo;Give me a [N]-slide LinkedIn carousel brief on [topic] &mdash; hook headline + accent word, stats, bullets, CTA keyword&rdquo;</b><br>3. Paste into fields in the left panel</div>
   </div>
 </div>
 
@@ -506,6 +595,13 @@ let S = {
   bg:'plain',
   font:'Playfair Display',
   cur:0,
+  caption:'',
+  hashtagSets:[
+    {name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},
+    {name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},
+    {name:'Business',tags:'#SmallBusiness #Entrepreneurship #BusinessGrowth #AustralianBusiness'}
+  ],
+  checklist:[false,false,false,false,false],
   slides:[
     { headline:'The one satisfying change that made all the difference.', accent:'all the difference.', themeOverride:null, blocks:[
       {type:'sub-text',text:'Most people overlook this. Here is what actually works.',bold:'Most people overlook this.'}
@@ -1106,13 +1202,175 @@ function renderBrief() {
   });
 }
 
+// ==================== CAPTION EDITOR ====================
 function renderCaption() {
-  const s0=S.slides[0]||{};
-  const ctaBlock=S.slides.flatMap(s=>s.blocks).find(b=>b.type==='cta-box');
-  const bulletBlock=S.slides.flatMap(s=>s.blocks).find(b=>b.type==='bullet-box');
-  const bullets=bulletBlock?`\n${bulletBlock.b1||''}\n${bulletBlock.b2||''}\n${bulletBlock.b3||''}`:'';
-  const kw=ctaBlock?ctaBlock.keyword:'FOLLOW';
-  document.getElementById('licap').textContent=`${s0.headline||''}\n\n${S.slides[0]?.blocks.find(b=>b.type==='sub-text')?.text||''}${bullets}\n\nComment ${kw} and I'll DM you the framework.\n\n#LinkedInTips #ContentCreation #PersonalBrand`;
+  const ta = document.getElementById('cap-text');
+  if (ta && S.caption) ta.value = S.caption;
+  updateCapCounter();
+  renderHashtagSets();
+  renderChecklist();
+}
+
+function updateCapCounter() {
+  const ta = document.getElementById('cap-text');
+  const counter = document.getElementById('cap-counter');
+  if (!ta || !counter) return;
+  const len = ta.value.length;
+  counter.textContent = len.toLocaleString() + ' / 3,000';
+  counter.className = 'cap-counter' + (len >= 3000 ? ' over' : len >= 1500 ? ' warn' : '');
+}
+
+function capInsert(text) {
+  const ta = document.getElementById('cap-text');
+  if (!ta) return;
+  ta.focus();
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
+  ta.selectionStart = ta.selectionEnd = start + text.length;
+  S.caption = ta.value;
+  updateCapCounter();
+}
+
+function capFormat(type) {
+  const ta = document.getElementById('cap-text');
+  if (!ta) return;
+  ta.focus();
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const selected = ta.value.substring(start, end);
+  if (!selected) return;
+  let replacement;
+  if (type === 'bold') {
+    replacement = toBoldUnicode(selected);
+  } else {
+    replacement = '_' + selected + '_';
+  }
+  ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
+  ta.selectionStart = start;
+  ta.selectionEnd = start + replacement.length;
+  S.caption = ta.value;
+  updateCapCounter();
+}
+
+function toBoldUnicode(str) {
+  const boldMap = {};
+  for (let i = 0; i < 26; i++) {
+    boldMap[String.fromCharCode(65 + i)] = String.fromCodePoint(0x1D400 + i);
+    boldMap[String.fromCharCode(97 + i)] = String.fromCodePoint(0x1D41A + i);
+  }
+  for (let i = 0; i < 10; i++) {
+    boldMap[String.fromCharCode(48 + i)] = String.fromCodePoint(0x1D7CE + i);
+  }
+  return [...str].map(c => boldMap[c] || c).join('');
+}
+
+function generateCaption() {
+  const ta = document.getElementById('cap-text');
+  if (!ta) return;
+  const s0 = S.slides[0] || {};
+  const hook = s0.headline || 'Your hook here';
+  const subBlock = S.slides[0]?.blocks.find(b => b.type === 'sub-text');
+  const subText = subBlock ? subBlock.text : '';
+  const bulletBlock = S.slides.flatMap(s => s.blocks).find(b => b.type === 'bullet-box');
+  const bullets = bulletBlock ? '\n\n\u2022 ' + (bulletBlock.b1||'') + '\n\u2022 ' + (bulletBlock.b2||'') + '\n\u2022 ' + (bulletBlock.b3||'') : '';
+  const ctaBlock = S.slides.flatMap(s => s.blocks).find(b => b.type === 'cta-box');
+  const kw = ctaBlock ? ctaBlock.keyword : 'FOLLOW';
+  const draft = hook + '\n\n' + subText + bullets + '\n\n\u2014\n\nComment "' + kw + '" and I\'ll send you the details.\n\nFollow for more \u{1F447}';
+  ta.value = draft;
+  S.caption = draft;
+  updateCapCounter();
+  toast('Caption draft generated');
+}
+
+function copyCaption() {
+  const ta = document.getElementById('cap-text');
+  if (!ta || !ta.value) { toast('Nothing to copy','err'); return; }
+  navigator.clipboard.writeText(ta.value).then(() => toast('Caption copied!')).catch(() => {
+    ta.select(); document.execCommand('copy'); toast('Caption copied!');
+  });
+}
+
+// ==================== HASHTAG MANAGER ====================
+function renderHashtagSets() {
+  const c = document.getElementById('htag-sets');
+  if (!c) return;
+  c.innerHTML = '';
+  (S.hashtagSets || []).forEach((set, i) => {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:4px';
+    const pill = document.createElement('span');
+    pill.className = 'htag-pill';
+    pill.textContent = set.name;
+    pill.title = set.tags;
+    pill.onclick = () => appendHashtags(set.tags);
+    d.appendChild(pill);
+    if (i >= 3) {
+      const del = document.createElement('span');
+      del.className = 'htag-del';
+      del.textContent = '\u00d7';
+      del.onclick = (e) => { e.stopPropagation(); S.hashtagSets.splice(i, 1); renderHashtagSets(); };
+      d.appendChild(del);
+    }
+    c.appendChild(d);
+  });
+}
+
+function appendHashtags(tags) {
+  const ta = document.getElementById('cap-text');
+  if (!ta) return;
+  const sep = ta.value && !ta.value.endsWith('\n') ? '\n\n' : '';
+  ta.value += sep + tags;
+  S.caption = ta.value;
+  ta.scrollTop = ta.scrollHeight;
+  updateCapCounter();
+  toast('Hashtags added');
+}
+
+function addHashtagSet() {
+  const nameEl = document.getElementById('htag-name');
+  const tagsEl = document.getElementById('htag-tags');
+  if (!nameEl || !tagsEl) return;
+  const name = nameEl.value.trim();
+  const tags = tagsEl.value.trim();
+  if (!name || !tags) { toast('Enter name and tags', 'err'); return; }
+  if ((S.hashtagSets || []).length >= 5) { toast('Max 5 sets', 'err'); return; }
+  S.hashtagSets = S.hashtagSets || [];
+  S.hashtagSets.push({ name, tags });
+  nameEl.value = '';
+  tagsEl.value = '';
+  renderHashtagSets();
+  toast('Hashtag set saved');
+}
+
+// ==================== CHECKLIST ====================
+const CHECKLIST_ITEMS = [
+  'Hook grabs attention in first 2 lines',
+  'CTA keyword on final slide',
+  '4\u20138 slides total',
+  'Caption written and formatted',
+  'Hashtags added'
+];
+
+function renderChecklist() {
+  const c = document.getElementById('checklist');
+  if (!c) return;
+  c.innerHTML = '';
+  CHECKLIST_ITEMS.forEach((label, i) => {
+    const checked = S.checklist && S.checklist[i];
+    const d = document.createElement('div');
+    d.className = 'check-item' + (checked ? ' checked' : '');
+    d.innerHTML = '<div class="check-box">' + (checked ? '\u2713' : '') + '</div><span class="check-label">' + label + '</span>';
+    d.onclick = () => { S.checklist[i] = !S.checklist[i]; renderChecklist(); };
+    c.appendChild(d);
+  });
+  const allDone = S.checklist && S.checklist.every(Boolean);
+  const ready = document.getElementById('check-ready');
+  if (ready) ready.style.display = allDone ? 'block' : 'none';
+}
+
+// ==================== HELP MODAL ====================
+function toggleHelpModal() {
+  const overlay = document.getElementById('help-overlay');
+  if (overlay) overlay.classList.toggle('on');
 }
 
 function renderAll() {
@@ -1329,6 +1587,9 @@ function handleImportJSON(input) {
         document.getElementById('gop-val').textContent=(GS.opacity||22)+'%';
         document.querySelectorAll('.pill[data-bg]').forEach(p=>p.classList.toggle('on',p.dataset.bg===S.bg));
         document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('on',p.dataset.font===S.font));
+        S.checklist=[false,false,false,false,false];
+        if(!S.hashtagSets) S.hashtagSets=[{name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},{name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},{name:'Business',tags:'#SmallBusiness #Entrepreneurship #BusinessGrowth #AustralianBusiness'}];
+        const capTa=document.getElementById('cap-text');if(capTa) capTa.value=S.caption||'';
         initThemeGrid();renderAll();
         toast('Draft imported: '+(data.name||file.name));
       } else {toast('Invalid draft file',true);}
@@ -1366,6 +1627,9 @@ function loadDraft(idx) {
   document.getElementById('gop-val').textContent=(GS.opacity||22)+'%';
   document.querySelectorAll('.pill[data-bg]').forEach(p=>p.classList.toggle('on',p.dataset.bg===S.bg));
   document.querySelectorAll('.fpill').forEach(p=>p.classList.toggle('on',p.dataset.font===S.font));
+  S.checklist=[false,false,false,false,false];
+  if(!S.hashtagSets) S.hashtagSets=[{name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},{name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},{name:'Business',tags:'#SmallBusiness #Entrepreneurship #BusinessGrowth #AustralianBusiness'}];
+  const capTa=document.getElementById('cap-text');if(capTa) capTa.value=S.caption||'';
   initThemeGrid();renderAll();toast('Loaded: '+saved.name);
 }
 
@@ -1405,6 +1669,7 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').repla
 
 // ==================== KEYBOARD ====================
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){const h=document.getElementById('help-overlay');if(h&&h.classList.contains('on')){h.classList.remove('on');return;}}
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
   if(e.key==='ArrowRight') next();
   if(e.key==='ArrowLeft') prev();
