@@ -1403,6 +1403,7 @@ function renderFields() {
   const si=S.cur, s=S.slides[si];
   if(!s) return;
   const themeKey=s.themeOverride||S.theme;
+  const t=THEMES[themeKey];
 
   // Theme override selector
   let themeOpts=`<option value="">Global (${THEMES[S.theme].name})</option>`;
