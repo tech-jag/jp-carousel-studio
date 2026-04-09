@@ -371,6 +371,11 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 
   <div class="psec">
     <div class="ptit">Profile</div>
+    <label class="lbl">Post mode</label>
+    <div class="pills" style="gap:4px;margin-bottom:8px">
+      <div class="pill" id="pm-carousel" onclick="setPostMode('carousel')">Carousel</div>
+      <div class="pill" id="pm-single" onclick="setPostMode('single')">Single Post</div>
+    </div>
     <label class="lbl">Handle / name</label>
     <input class="fi" id="f-handle" value="Your Name &middot; Your Title" oninput="S.handle=this.value;renderCanvas()">
     <label class="lbl">Category tag</label>
@@ -510,7 +515,7 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 <div class="pc" id="pc">
   <div class="cwrap" id="cwrap"><div class="cframe" id="canvas"></div></div>
   <div class="cdots" id="cdots"></div>
-  <div class="cnav">
+  <div class="cnav" id="cnav">
     <button class="cnb" onclick="prev()">&#8592;</button>
     <span class="cnlbl" id="cnlbl">Slide 1 of 4</span>
     <button class="cnb" onclick="next()">&#8594;</button>
@@ -758,6 +763,7 @@ let S = {
   showCounter:true,
   showFooter:true,
   showSwipe:true,
+  postMode:'carousel',
   hashtagSets:[
     {name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},
     {name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},
@@ -870,6 +876,24 @@ const SLIDE_TEMPLATES = {
     label:'Magazine Cover', desc:'Big headline only, full-slide impact',
     headline:"The future of your industry is already here.", accent:"already",
     blocks:[{type:'body-text',text:'A bold statement that stops the scroll.'}]
+  },
+  'single-announcement': {
+    label:'Announcement', desc:'Large headline + sub-text, clean',
+    headline:"We just launched something big.", accent:"something big.",
+    blocks:[{type:'sub-text',text:'After months of work, it is finally here. Here is what it means for you.',bold:'finally here.'}],
+    singlePost:true
+  },
+  'single-quote': {
+    label:'Quote Post', desc:'Big italic quote + attribution',
+    headline:"Words that changed everything.", accent:"everything.",
+    blocks:[{type:'quote-block',text:'The only way to do great work is to love what you do.',attribution:'Steve Jobs',align:'center',quoteStyle:'decorative'}],
+    singlePost:true
+  },
+  'single-stat': {
+    label:'Stat Post', desc:'Giant stat centred + label + sub-caption',
+    headline:"One number that says it all.", accent:"says it all.",
+    blocks:[{type:'stat-row',stats:[{value:'10\u00d7',label:'Return on investment'}]},{type:'sub-text',text:'This is the result after 90 days of focused execution.',bold:'90 days'}],
+    singlePost:true
   },
 };
 
@@ -1289,8 +1313,9 @@ function buildSlide(slide,idx,total,font) {
   const logoEl=logoSrc?`<img src="${logoSrc}" style="${logoImgStyle}">`:'';
 
   // Swipe / progress indicator
+  const singleMode=S.postMode==='single';
   let swipeHTML='';
-  if(S.showSwipe!==false&&idx<total-1) {
+  if(!singleMode&&S.showSwipe!==false&&idx<total-1) {
     const ss=S.swipeStyle||'swipe';
     if(ss==='swipe') swipeHTML=`<span style="font-family:${mono};font-size:8px;color:${T3};text-transform:uppercase;letter-spacing:1px">swipe \u2192</span>`;
     else if(ss==='arrows') swipeHTML=`<span style="font-family:${mono};font-size:10px;color:${T3}">\u2192 \u2192</span>`;
@@ -1311,7 +1336,7 @@ function buildSlide(slide,idx,total,font) {
 
   // Counter element (uses tagC instead of ctrC for visibility)
   const ctrFs=S.counterFontSize||9;
-  const counterEl=S.showCounter!==false?`<span style="font-family:${mono};font-size:${ctrFs}px;color:${t.tagC}">${idx+1} / ${total}</span>`:'';
+  const counterEl=(!singleMode&&S.showCounter!==false)?`<span style="font-family:${mono};font-size:${ctrFs}px;color:${t.tagC}">${idx+1} / ${total}</span>`:'';
 
   // Header row: [tag] [spacer] [logo if top] [counter]
   const hdrLogo=(logoEl&&logoIsTop)?`${logoIsRight?'':logoEl}<div style="flex:1"></div>${logoIsRight?logoEl:''}`:`<div style="flex:1"></div>`;
@@ -1428,9 +1453,12 @@ function renderFields() {
   let addOpts='<option value="">+ Add Block...</option>';
   Object.keys(BLOCK_LABELS).forEach(k=>{addOpts+=`<option value="${k}">${BLOCK_LABELS[k]}</option>`;});
 
+  const isSingle=S.postMode==='single';
+  const tplEntries=Object.entries(SLIDE_TEMPLATES).filter(([k,v])=>isSingle?v.singlePost:!v.singlePost);
+
   document.getElementById('sfields').innerHTML=`
     <div class="psec">
-      <div class="ptit">Slide ${si+1} Editor</div>
+      <div class="ptit">${isSingle?'Post Editor':'Slide '+(si+1)+' Editor'}</div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
         <label class="lbl" style="margin:0;min-width:40px">Theme</label>
         <select id="slide-theme-sel" class="theme-sel" onchange="setSlideTheme(${si},this.value)">${themeOpts}</select>
@@ -1439,7 +1467,7 @@ function renderFields() {
         <label class="lbl">Load Template</label>
         <select id="tpl-select" class="theme-sel" style="width:100%" onchange="if(this.value){loadTemplate(this.value);}">
           <option value="">— Choose a template —</option>
-          ${Object.entries(SLIDE_TEMPLATES).map(([k,v])=>`<option value="${k}">${v.label} — ${v.desc}</option>`).join('')}
+          ${tplEntries.map(([k,v])=>`<option value="${k}">${v.label} — ${v.desc}</option>`).join('')}
         </select>
       </div>
       <label class="lbl">Headline</label>
@@ -2029,7 +2057,26 @@ function moveBlock(si,bi,dir) {
   renderAll();
 }
 
+function setPostMode(mode) {
+  S.postMode=mode;
+  applyPostMode();
+  renderAll();
+  toast(mode==='single'?'Single Post mode':'Carousel mode');
+}
+function applyPostMode() {
+  const single=S.postMode==='single';
+  document.getElementById('pm-carousel').className='pill'+(single?'':' on');
+  document.getElementById('pm-single').className='pill'+(single?' on':'');
+  document.getElementById('cdots').style.display=single?'none':'';
+  document.getElementById('cnav').style.display=single?'none':'';
+  const expOne=document.querySelector('.exp-one');
+  if(expOne) expOne.innerHTML=single?'&#11015; Export Image (PNG)':'&#11015; Export This Slide (PNG)';
+  const expAll=document.querySelector('.exp-all');
+  if(expAll) expAll.style.display=single?'none':'';
+}
+
 function addSlide() {
+  if(S.postMode==='single'){toast('Single Post mode \u2014 switch to Carousel for multiple slides','err');return;}
   if(S.slides.length>=12){toast('Max 12 slides',true);return;}
   S.slides.push({headline:'New slide.',accent:'slide.',themeOverride:null,hlSize:'auto',letterSpacing:'normal',blocks:[{type:'sub-text',text:'Add your content here.',bold:''}]});
   S.cur=S.slides.length-1;renderAll();toast('Slide added');
@@ -2195,6 +2242,7 @@ function syncProfileUI() {
   document.getElementById('f-show-counter').checked=S.showCounter!==false;
   document.getElementById('f-show-footer').checked=S.showFooter!==false;
   document.getElementById('f-show-swipe').checked=S.showSwipe!==false;
+  applyPostMode();
 }
 
 // ==================== DRAFT MANAGEMENT ====================
@@ -2337,7 +2385,7 @@ function authCheck() {
     sessionStorage.setItem('postcanvas-auth','1');
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('studio-wrap').style.display='flex';
-    initBrandKitUI();initThemeGrid();renderAll();applyZoom();
+    initBrandKitUI();initThemeGrid();renderAll();applyPostMode();applyZoom();
   } else {
     const inp=document.getElementById('auth-pw');
     const err=document.getElementById('auth-err');
@@ -2353,7 +2401,7 @@ function authCheck() {
 if(sessionStorage.getItem('postcanvas-auth')==='1') {
   document.getElementById('auth-overlay').style.display='none';
   document.getElementById('studio-wrap').style.display='flex';
-  initBrandKitUI();initThemeGrid();renderAll();applyZoom();
+  initBrandKitUI();initThemeGrid();renderAll();applyPostMode();applyZoom();
 } else {
   document.getElementById('auth-pw').focus();
 }
