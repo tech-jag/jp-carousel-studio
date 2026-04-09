@@ -526,7 +526,7 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
     <button class="expbtn exp-all" onclick="exportAllSlides()">&#11015; Export All Slides</button>
   </div>
   <div class="exprow">
-    <button class="expbtn" id="preview-btn" onclick="togglePreview()" style="flex:1">&#9654; Preview</button>
+    <button class="expbtn" id="preview-btn" onclick="togglePreview()" style="flex:1;background:var(--bg3);color:var(--text);border:1px solid var(--border)">&#9654; Preview</button>
   </div>
 </div>
 
@@ -1665,6 +1665,7 @@ function renderBlockFields(b,si,bi) {
 
 function renderBrief() {
   const c=document.getElementById('bcards');
+  if(!c) return;
   c.innerHTML='';
   S.slides.forEach((s,i)=>{
     const lbl=s.blocks.length?(SLIDE_LABELS[s.blocks[0].type]||'Slide'):'Empty';
@@ -1923,7 +1924,7 @@ function togglePreview() {
 function stopPreview() {
   clearInterval(previewTimer);previewTimer=null;
   const btn=document.getElementById('preview-btn');
-  btn.innerHTML='&#9654; Preview';btn.style.background='';btn.style.color='';
+  btn.innerHTML='&#9654; Preview';btn.style.background='var(--bg3)';btn.style.color='var(--text)';
 }
 
 // ==================== CONTROLS ====================
