@@ -583,8 +583,43 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
 
 <!-- HELP MODAL -->
 <div class="help-overlay" id="help-overlay" onclick="if(event.target===this)toggleHelpModal()">
-  <div class="help-panel">
-    <h3>Keyboard Shortcuts</h3>
+  <div class="help-panel" style="max-height:85vh;overflow-y:auto">
+    <h3>Prompt Builder</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+      <div>
+        <label class="lbl">Topic category</label>
+        <select class="fi" id="pb-topic" style="margin:0;padding:5px 8px;width:100%">
+          <option>Tech Leadership</option><option>AI &amp; Automation</option><option>Founder Journey</option>
+          <option>Melbourne Business</option><option>Content Strategy</option><option>Personal Brand</option>
+          <option>Client Results</option><option>Industry Insight</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl">Slides</label>
+        <select class="fi" id="pb-slides" style="margin:0;padding:5px 8px;width:100%">
+          <option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl">Audience</label>
+        <select class="fi" id="pb-audience" style="margin:0;padding:5px 8px;width:100%">
+          <option>Tech Founders</option><option>CTOs &amp; Tech Leaders</option><option>SMB Owners</option>
+          <option>Marketing Teams</option><option>General LinkedIn</option><option>Australian Business</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl">Tone</label>
+        <select class="fi" id="pb-tone" style="margin:0;padding:5px 8px;width:100%">
+          <option>Educational</option><option>Provocative</option><option>Story-driven</option>
+          <option>Data-heavy</option><option>Inspirational</option><option>Tactical</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn ba" onclick="buildPrompt()" style="width:100%;margin-bottom:6px">Build Prompt</button>
+    <textarea id="pb-output" readonly style="width:100%;height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.6;resize:vertical;margin-bottom:6px" placeholder="Click Build Prompt to generate..."></textarea>
+    <button class="btn bgreen" onclick="copyPrompt()" style="width:100%">Copy Prompt</button>
+
+    <h3 style="margin-top:14px">Keyboard Shortcuts</h3>
     <div class="help-row"><span class="help-key">&larr; &rarr;</span><span class="help-desc">Navigate slides</span></div>
     <div class="help-row"><span class="help-key">1 &ndash; 9</span><span class="help-desc">Jump to slide</span></div>
     <div class="help-row"><span class="help-key">S</span><span class="help-desc">Save draft</span></div>
@@ -592,8 +627,6 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
     <div class="help-row"><span class="help-key">E</span><span class="help-desc">Export current slide as PNG</span></div>
     <h3>Export Guide</h3>
     <div class="help-text"><b>PNG Export</b> uses html2canvas &mdash; click "Export This Slide" or "Export All Slides" for high-res PNGs sized to your canvas.<br><br><b>LinkedIn:</b> Upload PNGs as a document post for maximum reach. Recommended: 4&ndash;8 slides.</div>
-    <h3>Research Workflow</h3>
-    <div class="help-text">1. Open <a href="https://claude.ai" target="_blank">Claude.ai</a><br>2. Ask: <b>&ldquo;Give me a [N]-slide LinkedIn carousel brief on [topic] &mdash; hook headline + accent word, stats, bullets, CTA keyword&rdquo;</b><br>3. Paste into fields in the left panel</div>
   </div>
 </div>
 
@@ -1890,8 +1923,41 @@ function toggleHelpModal() {
   if (overlay) overlay.classList.toggle('on');
 }
 
+function buildPrompt() {
+  const topic=document.getElementById('pb-topic').value;
+  const slides=document.getElementById('pb-slides').value;
+  const audience=document.getElementById('pb-audience').value;
+  const tone=document.getElementById('pb-tone').value;
+  const prompt=`Give me a ${slides}-slide LinkedIn carousel post brief for ${audience} about ${topic}. Tone: ${tone}.
+
+For each slide provide:
+- Headline (max 10 words)
+- Italic accent word (1-2 words from the headline)
+- Sub-caption (1-2 sentences, monospace style)
+
+Also provide:
+- Slide 2: 3 stats with values and labels
+- Slide 3: 3 bullet points for 'what actually works'
+- Final slide: CTA keyword (1 word, all caps)
+- Suggested hashtags (5-8 tags)
+
+Format as a numbered list. Be specific and actionable. Write from the perspective of a ${audience} expert.`;
+  document.getElementById('pb-output').value=prompt;
+}
+
+function copyPrompt() {
+  const ta=document.getElementById('pb-output');
+  if(!ta||!ta.value){toast('Build a prompt first','err');return;}
+  navigator.clipboard.writeText(ta.value).then(()=>toast('Prompt copied!')).catch(()=>{ta.select();document.execCommand('copy');toast('Prompt copied!');});
+}
+
 function renderAll() {
-  renderCanvas();renderTabs();renderFields();renderBrief();renderCaption();refreshDraftList();
+  try{renderCanvas();}catch(e){console.error('renderCanvas:',e);}
+  try{renderTabs();}catch(e){console.error('renderTabs:',e);}
+  try{renderFields();}catch(e){console.error('renderFields:',e);}
+  try{renderBrief();}catch(e){console.error('renderBrief:',e);}
+  try{renderCaption();}catch(e){console.error('renderCaption:',e);}
+  try{refreshDraftList();}catch(e){console.error('refreshDraftList:',e);}
 }
 
 // ==================== NAVIGATION ====================
