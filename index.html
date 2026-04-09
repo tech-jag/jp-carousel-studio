@@ -539,8 +539,10 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
       <button class="cap-tbtn" onclick="capFormat('italic')" title="Italic"><i>I</i></button>
       <button class="cap-tbtn" onclick="capInsert('\u2022 ')" title="Bullet point">&bull;</button>
       <button class="cap-tbtn" onclick="capInsert(String.fromCharCode(10))" title="Line break">&crarr;</button>
+      <button class="cap-tbtn" id="cap-preview-btn" onclick="toggleCapPreview()" title="Preview / Edit" style="margin-left:auto;font-size:9px;letter-spacing:.5px">Preview</button>
     </div>
     <textarea class="cap-textarea" id="cap-text" placeholder="Write your LinkedIn caption here..." oninput="updateCapCounter();S.caption=this.value"></textarea>
+    <div id="cap-preview" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;word-wrap:break-word;min-height:120px;max-height:220px;overflow-y:auto"></div>
     <div class="cap-counter" id="cap-counter">0 / 3,000</div>
     <div class="cap-emoji-row">
       <button class="cap-emoji" onclick="capInsert('&#x1F680;')">&#x1F680;</button>
@@ -1668,6 +1670,24 @@ function renderCaption() {
   updateCapCounter();
   renderHashtagSets();
   renderChecklist();
+}
+
+let capPreviewOn=false;
+function toggleCapPreview() {
+  capPreviewOn=!capPreviewOn;
+  const ta=document.getElementById('cap-text');
+  const pv=document.getElementById('cap-preview');
+  const btn=document.getElementById('cap-preview-btn');
+  if(capPreviewOn) {
+    ta.style.display='none';pv.style.display='block';btn.textContent='Edit';
+    let html=esc(ta.value||'');
+    html=html.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    html=html.replace(/_(.+?)_/g,'<i>$1</i>');
+    html=html.replace(/\n/g,'<br>');
+    pv.innerHTML=html;
+  } else {
+    ta.style.display='';pv.style.display='none';btn.textContent='Preview';
+  }
 }
 
 function updateCapCounter() {
