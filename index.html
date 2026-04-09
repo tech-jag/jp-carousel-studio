@@ -871,8 +871,11 @@ function renderBlock(block,t,font,themeKey) {
       const bullets=block.bullets||[];
       const fs=block.fontSize||9.5;
       const txColor=block.textColor||T2;
+      const lblFs=block.labelFontSize||8;
+      const lblFf=block.labelFontFamily?`'${block.labelFontFamily}',sans-serif`:mono;
+      const lblColor=block.labelColor||T3;
       return `<div style="background:${CB};border:1px solid ${CBB};border-radius:7px;padding:12px">
-        <div style="font-family:${mono};font-size:7.5px;letter-spacing:2px;color:${T3};text-transform:uppercase;margin-bottom:9px">${block.label||''}</div>
+        <div style="font-family:${lblFf};font-size:${lblFs}px;letter-spacing:2px;color:${lblColor};text-transform:uppercase;margin-bottom:9px">${block.label||''}</div>
         ${bullets.map(b=>`<div style="font-family:${bff||mono};font-size:${fs}px;color:${txColor};line-height:2.1"><span style="color:${A};margin-right:5px">\u2022</span>${b}</div>`).join('')}
       </div>`;
     }
@@ -881,8 +884,9 @@ function renderBlock(block,t,font,themeKey) {
       const steps=block.steps||[];
       const fs=block.fontSize||10.5;
       const txColor=block.textColor||TX;
+      const numColor=block.numberColor||A;
       return steps.map((s,i)=>
-        `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:${CB};border:1px solid ${CBB};border-radius:6px"><span style="font-family:${mono};font-size:11px;color:${A};font-weight:600;min-width:20px">0${i+1}</span><span style="font-family:${bff||sans};font-size:${fs}px;color:${txColor};line-height:1.5">${s}</span></div>`
+        `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:${CB};border:1px solid ${CBB};border-radius:6px"><span style="font-family:${mono};font-size:11px;color:${numColor};font-weight:600;min-width:20px">0${i+1}</span><span style="font-family:${bff||sans};font-size:${fs}px;color:${txColor};line-height:1.5">${s}</span></div>`
       ).join('');
     }
 
@@ -917,14 +921,17 @@ function renderBlock(block,t,font,themeKey) {
       const leftItems=block.leftItems||[];
       const rightItems=block.rightItems||[];
       const fs=block.fontSize||9.5;
+      const leftLC=block.leftLabelColor||'#4aaa4a';
+      const rightLC=block.rightLabelColor||A;
+      const itemTC=block.itemTextColor||T2;
       return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div>
-          <div style="font-family:${mono};font-size:7.5px;letter-spacing:1.5px;color:#4aaa4a;margin-bottom:8px">\u2713 ${block.leftLabel||'LEFT'}</div>
-          ${leftItems.map(item=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="width:5px;height:5px;border-radius:50%;background:#4aaa4a;flex-shrink:0"></span><span style="font-family:${bff||sans};font-size:${fs}px;color:${T2}">${item}</span></div>`).join('')}
+          <div style="font-family:${mono};font-size:7.5px;letter-spacing:1.5px;color:${leftLC};margin-bottom:8px">\u2713 ${block.leftLabel||'LEFT'}</div>
+          ${leftItems.map(item=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="width:5px;height:5px;border-radius:50%;background:${leftLC};flex-shrink:0"></span><span style="font-family:${bff||sans};font-size:${fs}px;color:${itemTC}">${item}</span></div>`).join('')}
         </div>
         <div>
-          <div style="font-family:${mono};font-size:7.5px;letter-spacing:1.5px;color:${A};margin-bottom:8px">\u26A0 ${block.rightLabel||'RIGHT'}</div>
-          ${rightItems.map(item=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="width:5px;height:5px;border-radius:50%;background:${A};flex-shrink:0"></span><span style="font-family:${bff||sans};font-size:${fs}px;color:${T2}">${item}</span></div>`).join('')}
+          <div style="font-family:${mono};font-size:7.5px;letter-spacing:1.5px;color:${rightLC};margin-bottom:8px">\u26A0 ${block.rightLabel||'RIGHT'}</div>
+          ${rightItems.map(item=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="width:5px;height:5px;border-radius:50%;background:${rightLC};flex-shrink:0"></span><span style="font-family:${bff||sans};font-size:${fs}px;color:${itemTC}">${item}</span></div>`).join('')}
         </div>
       </div>`;
     }
@@ -932,24 +939,27 @@ function renderBlock(block,t,font,themeKey) {
     case 'grid-cards': {
       const cards=block.cards||[];
       const cols=cards.length<=4?2:3;
-      const fs=block.fontSize||11;
+      const tFs=block.titleFontSize||11;
+      const bFs=block.bodyFontSize||9;
+      const titleC=block.titleColor||TX;
+      const bodyC=block.bodyColor||T2;
       return `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:6px">${
         cards.map((c,ci)=>`<div style="background:${CB};border:1px solid ${ci===cards.length-1?A:CBB};border-radius:6px;padding:10px">
           <div style="font-size:16px;margin-bottom:5px">${c.icon||''}</div>
-          <div style="font-family:${bff||sans};font-size:${fs}px;font-weight:700;color:${ci===cards.length-1?A:TX};margin-bottom:3px">${c.title||''}</div>
-          <div style="font-family:${bff||sans};font-size:${Math.max(fs-2,8)}px;color:${T2};line-height:1.4">${c.body||''}</div>
+          <div style="font-family:${bff||sans};font-size:${tFs}px;font-weight:700;color:${ci===cards.length-1?A:titleC};margin-bottom:3px">${c.title||''}</div>
+          <div style="font-family:${bff||sans};font-size:${bFs}px;color:${bodyC};line-height:1.4">${c.body||''}</div>
         </div>`).join('')}</div>`;
     }
 
     case 'cta-box': {
       const isBreaking=themeKey==='breaking';
       const kw=block.keyword||'KEYWORD';
-      const ctaFf=bff||ff;
-      const kwFs=block.fontSize?block.fontSize+'px':isBreaking?'clamp(42px,8vw,64px)':'clamp(26px,5vw,38px)';
+      const kwFf=block.kwFontFamily?`'${block.kwFontFamily}',sans-serif`:bff||ff;
+      const kwFs=block.kwFontSize?block.kwFontSize+'px':isBreaking?'clamp(42px,8vw,64px)':'clamp(26px,5vw,38px)';
       const kwColor=block.keywordColor||(isBreaking?A:TX);
       const hintColor=block.hintColor||T3;
-      const hintFs=block.fontSize?Math.round(block.fontSize*0.6)+'px':'7.5px';
-      const kwStyle=`font-family:${ctaFf};font-size:${kwFs};font-weight:900;color:${kwColor};letter-spacing:${isBreaking?'4':'5'}px;display:block;margin:${isBreaking?'10px 0 6px':'7px 0 4px'}`;
+      const hintFs=block.hintFontSize?block.hintFontSize+'px':'9px';
+      const kwStyle=`font-family:${kwFf};font-size:${kwFs};font-weight:900;color:${kwColor};letter-spacing:${isBreaking?'4':'5'}px;display:block;margin:${isBreaking?'10px 0 6px':'7px 0 4px'}`;
       return `<div style="background:${CB};border:1px solid ${CBB};border-radius:8px;padding:16px;text-align:center">
         <div style="font-family:${mono};font-size:${hintFs};letter-spacing:2px;color:${hintColor};text-transform:uppercase">${block.hint||'comment this word'}</div>
         <span style="${kwStyle}">${kw}</span>
@@ -1074,7 +1084,7 @@ function buildSlide(slide,idx,total,font) {
     :`font-family:${ff};font-size:${fs};font-weight:900;line-height:${lh};letter-spacing:${hlLs};color:${TX};margin-bottom:8px${hlTransform}`;
 
   // Render blocks
-  const blocksHTML=slide.blocks.map(b=>renderBlock(b,t,font,themeKey)).join('');
+  const blocksHTML=slide.blocks.map(b=>{const mt=b.topSpacing||0;const html=renderBlock(b,t,font,themeKey);return mt?`<div style="margin-top:${mt}px">${html}</div>`:html;}).join('');
 
   const padding=isLinenTut?'20px 22px 14px':'26px 26px 16px';
 
@@ -1167,6 +1177,7 @@ function renderFields() {
         <button class="blk-btn del" onclick="removeBlock(${si},${bi})" title="Remove">\u00D7</button>
       </div>
       ${renderBlockFields(b,si,bi)}
+      <div style="margin-top:6px"><label class="lbl">Top spacing (px)</label><input class="fi" type="number" min="0" max="40" value="${b.topSpacing||0}" oninput="updBlock(${si},${bi},'topSpacing',parseInt(this.value)||0)" style="margin:0;padding:5px 8px;width:70px"></div>
     </div>`;
   });
 
@@ -1290,7 +1301,12 @@ function renderBlockFields(b,si,bi) {
       ).join('');
       h+=`<button class="btn bg" style="width:100%;font-size:8px;margin-top:4px" onclick="addBlockArrItem(${si},${bi},'bullets')">+ Add Bullet</button>`;
       h+=fontControls(si,bi,b);
-      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'textColor','Text colour',b.textColor||'#b0a898')}</div>`;
+      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'textColor','Bullet colour',b.textColor||'#b0a898')}</div>`;
+      h+=`<div style="border:1px solid var(--border);border-radius:4px;padding:6px;margin-top:6px">
+        <span class="lbl" style="margin-bottom:4px">Label font</span>
+        <div class="frow"><div><label class="lbl">Size (px)</label><input class="fi" type="number" min="6" max="20" placeholder="8" value="${b.labelFontSize||''}" oninput="updBlock(${si},${bi},'labelFontSize',this.value?parseInt(this.value):null)" style="margin:0;padding:5px 8px"></div><div><label class="lbl">Family</label><select class="theme-sel" onchange="updBlock(${si},${bi},'labelFontFamily',this.value||null)" style="width:100%">${FONT_OPTIONS.map(f=>`<option value="${f.value}"${(b.labelFontFamily||'')===f.value?' selected':''}>${f.label}</option>`).join('')}</select></div></div>
+        <div class="frow" style="margin-top:4px">${colorPick(si,bi,'labelColor','Label colour',b.labelColor||'#706860')}</div>
+      </div>`;
       return h;
     }
     case 'numbered-steps': {
@@ -1300,7 +1316,7 @@ function renderBlockFields(b,si,bi) {
       ).join('');
       h+=`<button class="btn bg" style="width:100%;font-size:8px;margin-top:4px" onclick="addBlockArrItem(${si},${bi},'steps')">+ Add Step</button>`;
       h+=fontControls(si,bi,b);
-      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'textColor','Text colour',b.textColor||'#f0ece4')}</div>`;
+      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'numberColor','Number colour',b.numberColor||'#c76a25')}${colorPick(si,bi,'textColor','Text colour',b.textColor||'#f0ece4')}</div>`;
       return h;
     }
     case 'step-pill-tag':
@@ -1329,7 +1345,10 @@ function renderBlockFields(b,si,bi) {
         `<div style="display:flex;gap:4px;align-items:center;margin-bottom:2px"><input class="fi" style="flex:1;margin:0" value="${esc(item)}" oninput="updBlockArr(${si},${bi},'rightItems',${i},this.value)"><button class="blk-btn del" onclick="removeBlockArrItem(${si},${bi},'rightItems',${i})">\u00D7</button></div>`
       ).join('');
       h+=`<button class="btn bg" style="width:100%;font-size:8px;margin-top:2px" onclick="addBlockArrItem(${si},${bi},'rightItems')">+ Add Right</button>`;
-      return h+fontControls(si,bi,b);
+      h+=fontControls(si,bi,b);
+      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'leftLabelColor','Left label',b.leftLabelColor||'#4aaa4a')}${colorPick(si,bi,'rightLabelColor','Right label',b.rightLabelColor||'#c76a25')}</div>`;
+      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'itemTextColor','Item text',b.itemTextColor||'#b0a898')}</div>`;
+      return h;
     }
     case 'grid-cards': {
       const cards=b.cards||[];
@@ -1341,13 +1360,23 @@ function renderBlockFields(b,si,bi) {
         </div>`
       ).join('');
       h+=`<button class="btn bg" style="width:100%;font-size:8px;margin-top:4px" onclick="addBlockArrItem(${si},${bi},'cards')">+ Add Card</button>`;
-      return h+fontControls(si,bi,b);
+      h+=fontControls(si,bi,b);
+      h+=`<div class="frow" style="margin-top:4px"><div><label class="lbl">Title size (px)</label><input class="fi" type="number" min="8" max="20" placeholder="11" value="${b.titleFontSize||''}" oninput="updBlock(${si},${bi},'titleFontSize',this.value?parseInt(this.value):null)" style="margin:0;padding:5px 8px"></div><div><label class="lbl">Body size (px)</label><input class="fi" type="number" min="6" max="16" placeholder="9" value="${b.bodyFontSize||''}" oninput="updBlock(${si},${bi},'bodyFontSize',this.value?parseInt(this.value):null)" style="margin:0;padding:5px 8px"></div></div>`;
+      h+=`<div class="frow" style="margin-top:4px">${colorPick(si,bi,'titleColor','Title colour',b.titleColor||'#f0ece4')}${colorPick(si,bi,'bodyColor','Body colour',b.bodyColor||'#b0a898')}</div>`;
+      return h;
     }
     case 'cta-box':
       return `<label class="lbl">CTA keyword</label><input class="fi" value="${esc(b.keyword||'')}" oninput="updBlock(${si},${bi},'keyword',this.value)">
         <label class="lbl">Top hint</label><input class="fi" value="${esc(b.hint||'')}" oninput="updBlock(${si},${bi},'hint',this.value)">
         <label class="lbl">Bottom hint</label><input class="fi" value="${esc(b.subHint||'')}" oninput="updBlock(${si},${bi},'subHint',this.value)">
-        ${fontControls(si,bi,b)}
+        <div style="border:1px solid var(--border);border-radius:4px;padding:6px;margin-top:6px">
+          <span class="lbl" style="margin-bottom:4px">Keyword font</span>
+          <div class="frow"><div><label class="lbl">Size (px)</label><input class="fi" type="number" min="16" max="80" placeholder="38" value="${b.kwFontSize||''}" oninput="updBlock(${si},${bi},'kwFontSize',this.value?parseInt(this.value):null)" style="margin:0;padding:5px 8px"></div><div><label class="lbl">Family</label><select class="theme-sel" onchange="updBlock(${si},${bi},'kwFontFamily',this.value||null)" style="width:100%">${FONT_OPTIONS.map(f=>`<option value="${f.value}"${(b.kwFontFamily||'')===f.value?' selected':''}>${f.label}</option>`).join('')}</select></div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:4px;padding:6px;margin-top:4px">
+          <span class="lbl" style="margin-bottom:4px">Hint font</span>
+          <div class="frow"><div><label class="lbl">Size (px)</label><input class="fi" type="number" min="6" max="20" placeholder="9" value="${b.hintFontSize||''}" oninput="updBlock(${si},${bi},'hintFontSize',this.value?parseInt(this.value):null)" style="margin:0;padding:5px 8px"></div><div></div></div>
+        </div>
         <div class="frow" style="margin-top:4px">${colorPick(si,bi,'keywordColor','Keyword colour',b.keywordColor||'#f0ece4')}${colorPick(si,bi,'hintColor','Hint colour',b.hintColor||'#706860')}</div>`;
     case 'quote-block':
       return `<label class="lbl">Quote</label><textarea class="ft" oninput="updBlock(${si},${bi},'text',this.value)">${esc(b.text||'')}</textarea>
