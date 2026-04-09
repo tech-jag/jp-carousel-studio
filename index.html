@@ -1115,6 +1115,7 @@ function renderBgLayers() {
   let html='';
   // Active layers
   if(S.bgLayers.length>0) {
+    html+='<div style="font-family:\'JetBrains Mono\',monospace;font-size:7.5px;color:var(--text3);letter-spacing:0.5px;margin-bottom:4px">&#9650; front &mdash; &#9660; back</div>';
     html+='<div style="margin-bottom:8px">';
     S.bgLayers.forEach((layer,i)=>{
       const label=BG_TYPE_LABELS[layer.type]||layer.type;
@@ -1127,8 +1128,8 @@ function renderBgLayers() {
       html+=`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);font-weight:700;letter-spacing:0.5px;flex:1;text-transform:uppercase;cursor:pointer" onclick="toggleBgLayer(${i})">${label}</span>`;
       html+=`<input type="range" min="0" max="100" step="5" value="${opVal}" style="width:55px;flex-shrink:0" oninput="updBgLayer(${i},'opacity',parseInt(this.value));this.nextElementSibling.textContent=this.value+'%'" title="Layer opacity">`;
       html+=`<span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text3);width:28px;text-align:right">${opVal}%</span>`;
-      html+=`<button class="blk-btn" onclick="moveBgLayer(${i},-1)" title="Move up" style="padding:2px 5px;font-size:9px">&#9650;</button>`;
-      html+=`<button class="blk-btn" onclick="moveBgLayer(${i},1)" title="Move down" style="padding:2px 5px;font-size:9px">&#9660;</button>`;
+      html+=`<button class="blk-btn" onclick="moveBgLayer(${i},-1)" title="Move to front" style="padding:2px 5px;font-size:9px">&#9650;</button>`;
+      html+=`<button class="blk-btn" onclick="moveBgLayer(${i},1)" title="Move to back" style="padding:2px 5px;font-size:9px">&#9660;</button>`;
       html+=`<button class="blk-btn del" onclick="removeBgLayer(${i})" title="Remove layer" style="padding:2px 5px;font-size:9px">&times;</button>`;
       html+=`</div>`;
       // Expanded settings
@@ -1438,7 +1439,7 @@ function buildSlide(slide,idx,total,font) {
   const hlTransform=(hlOx||hlOy)?`;transform:translate(${hlOx}px,${hlOy}px)`:'';
   const mono="'JetBrains Mono',monospace";
   const layers=S.bgLayers||[];
-  const layerDivs=layers.map((layer,li)=>{const svg=getBG(layer,themeKey,li);if(!svg) return '';const lop=(layer.opacity!=null?layer.opacity:100)/100;return `<div class="sbg" style="opacity:${lop}"><div style="position:absolute;inset:0;overflow:hidden">${svg}</div></div>`;}).join('');
+  const layerDivs=[...layers].reverse().map((layer,ri)=>{const li=layers.length-1-ri;const svg=getBG(layer,themeKey,li);if(!svg) return '';const lop=(layer.opacity!=null?layer.opacity:100)/100;return `<div class="sbg" style="opacity:${lop};z-index:${ri}"><div style="position:absolute;inset:0;overflow:hidden">${svg}</div></div>`;}).join('');
   const hlAccent=slide.accentOverride||A;
   const hlHTML=hl(slide.headline||'',slide.accent||'',hlAccent,hlFont);
   const handle=S.handle, tag=S.tag;
