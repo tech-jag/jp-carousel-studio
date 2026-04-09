@@ -343,6 +343,17 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
         <option value="top-right">Top right</option>
       </select>
     </div>
+    <div class="frow" style="margin-bottom:4px">
+      <div style="flex:1">
+        <label class="lbl" id="bk-ox-lbl">X Offset 0px</label>
+        <input type="range" id="bk-ox" min="-50" max="50" step="1" value="0" style="width:100%" oninput="BK.logoOffsetX=parseInt(this.value);document.getElementById('bk-ox-lbl').textContent='X Offset '+(this.value>0?'+':'')+this.value+'px';renderCanvas()">
+      </div>
+      <div style="flex:1">
+        <label class="lbl" id="bk-oy-lbl">Y Offset 0px</label>
+        <input type="range" id="bk-oy" min="-50" max="50" step="1" value="0" style="width:100%" oninput="BK.logoOffsetY=parseInt(this.value);document.getElementById('bk-oy-lbl').textContent='Y Offset '+(this.value>0?'+':'')+this.value+'px';renderCanvas()">
+      </div>
+      <div style="display:flex;align-items:flex-end;padding-bottom:2px"><button class="btn bg" style="font-size:7px;padding:4px 6px" onclick="BK.logoOffsetX=0;BK.logoOffsetY=0;document.getElementById('bk-ox').value=0;document.getElementById('bk-oy').value=0;document.getElementById('bk-ox-lbl').textContent='X Offset 0px';document.getElementById('bk-oy-lbl').textContent='Y Offset 0px';renderCanvas()">Reset</button></div>
+    </div>
     <div style="margin-bottom:4px">
       <label class="lbl" id="bk-size-lbl">Size 40px</label>
       <input type="range" id="bk-size" min="8" max="120" step="2" value="40" style="width:100%" oninput="BK.logoSize=parseInt(this.value);document.getElementById('bk-size-lbl').textContent='Size '+this.value+'px';renderCanvas()">
@@ -738,7 +749,7 @@ let S = {
 let GS = {c1:'#c76a25', c2:'#facb67', c3:'#7a1c1c', dir:'radial', opacity:22};
 
 // ==================== BRAND KIT ====================
-let BK = {primary:'#c76a25', secondary:'#facb67', background:'#141414', text:'#f0ece4', logoDataDark:'', logoDataLight:'', logoPos:'bottom-left', logoSize:40, logoOpacity:100, showOnAll:true};
+let BK = {primary:'#c76a25', secondary:'#facb67', background:'#141414', text:'#f0ece4', logoDataDark:'', logoDataLight:'', logoPos:'bottom-left', logoSize:40, logoOpacity:100, logoOffsetX:0, logoOffsetY:0, showOnAll:true};
 function loadBK(){try{const s=localStorage.getItem('postcanvas-brand-kit');if(s){const d=JSON.parse(s);BK={...BK,...d};if(d.logoData&&!d.logoDataDark){BK.logoDataDark=d.logoData;delete BK.logoData;}}}catch{}}
 function saveBK(){localStorage.setItem('postcanvas-brand-kit',JSON.stringify(BK));toast('Brand Kit saved');}
 loadBK();
@@ -927,6 +938,11 @@ function initBrandKitUI() {
   document.getElementById('bk-opacity').value=BK.logoOpacity;
   document.getElementById('bk-opacity-lbl').textContent='Opacity '+BK.logoOpacity+'%';
   document.getElementById('bk-all').checked=BK.showOnAll;
+  const ox=BK.logoOffsetX||0, oy=BK.logoOffsetY||0;
+  document.getElementById('bk-ox').value=ox;
+  document.getElementById('bk-ox-lbl').textContent='X Offset '+(ox>0?'+':'')+ox+'px';
+  document.getElementById('bk-oy').value=oy;
+  document.getElementById('bk-oy-lbl').textContent='Y Offset '+(oy>0?'+':'')+oy+'px';
   // Dark logo preview
   const dPrev=document.getElementById('bk-logo-dark-preview');
   const dImg=document.getElementById('bk-logo-dark-img');
@@ -1230,7 +1246,9 @@ function buildSlide(slide,idx,total,font) {
   const logoPos=BK.logoPos||'bottom-left';
   const logoIsTop=logoPos==='top-left'||logoPos==='top-right';
   const logoIsRight=logoPos==='top-right'||logoPos==='bottom-right';
-  const logoImgStyle=`height:${logoSz}px;width:auto;object-fit:contain;opacity:${logoOp/100};flex-shrink:0`;
+  const loOx=BK.logoOffsetX||0, loOy=BK.logoOffsetY||0;
+  const loTransform=(loOx||loOy)?`;transform:translate(${loOx}px,${loOy}px)`:'';
+  const logoImgStyle=`height:${logoSz}px;width:auto;object-fit:contain;opacity:${logoOp/100};flex-shrink:0${loTransform}`;
   const logoEl=logoSrc?`<img src="${logoSrc}" style="${logoImgStyle}">`:'';
 
   // Swipe / progress indicator
