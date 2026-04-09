@@ -421,11 +421,60 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif
       <div class="pill" data-bg="dots" onclick="setBg(this)">Dots</div>
       <div class="pill" data-bg="shapes3d" onclick="setBg(this)">3D Shapes</div>
       <div class="pill" data-bg="circles" onclick="setBg(this)">Circles</div>
+      <div class="pill" data-bg="hexagon" onclick="setBg(this)">Hexagon</div>
+      <div class="pill" data-bg="cross" onclick="setBg(this)">Cross</div>
+      <div class="pill" data-bg="diagonal" onclick="setBg(this)">Lines</div>
+      <div class="pill" data-bg="ghost-text" onclick="setBg(this)">Ghost Text</div>
       <div class="pill" data-bg="gradient" onclick="setBg(this)">Gradient</div>
       <div class="pill" data-bg="glow" onclick="setBg(this)">Glow</div>
       <div class="pill" data-bg="multi-glow" onclick="setBg(this)">Multi Glow</div>
-      <div class="pill" data-bg="diagonal" onclick="setBg(this)">Lines</div>
       <div class="pill" data-bg="noise" onclick="setBg(this)">Noise</div>
+    </div>
+    <div style="margin-top:8px">
+      <label class="lbl" id="bgop-lbl">Pattern opacity <span style="color:var(--text2)">40%</span></label>
+      <input type="range" min="5" max="100" step="5" value="40" id="bgop-slider" style="width:100%" oninput="S.bgOpacity=parseInt(this.value);document.getElementById('bgop-lbl').lastChild.textContent=this.value+'%';renderCanvas()">
+    </div>
+    <div id="ghost-text-controls" style="display:none;margin-top:8px">
+      <label class="lbl">Ghost text</label>
+      <input class="fi" id="gt-text" placeholder="YOUR BRAND" oninput="S.ghostText=this.value;renderCanvas()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+        <div>
+          <label class="lbl" id="gt-size-lbl">Font size <span style="color:var(--text2)">120px</span></label>
+          <input type="range" min="40" max="200" step="5" value="120" id="gt-size" style="width:100%" oninput="S.ghostSize=parseInt(this.value);document.getElementById('gt-size-lbl').lastChild.textContent=this.value+'px';renderCanvas()">
+        </div>
+        <div>
+          <label class="lbl" id="gt-op-lbl">Opacity <span style="color:var(--text2)">10%</span></label>
+          <input type="range" min="3" max="40" step="1" value="10" id="gt-op" style="width:100%" oninput="S.ghostOpacity=parseInt(this.value);document.getElementById('gt-op-lbl').lastChild.textContent=this.value+'%';renderCanvas()">
+        </div>
+        <div>
+          <label class="lbl" id="gt-x-lbl">X position <span style="color:var(--text2)">0</span></label>
+          <input type="range" min="-100" max="100" value="0" id="gt-x" style="width:100%" oninput="S.ghostX=parseInt(this.value);document.getElementById('gt-x-lbl').lastChild.textContent=this.value;renderCanvas()">
+        </div>
+        <div>
+          <label class="lbl" id="gt-y-lbl">Y position <span style="color:var(--text2)">0</span></label>
+          <input type="range" min="-100" max="100" value="0" id="gt-y" style="width:100%" oninput="S.ghostY=parseInt(this.value);document.getElementById('gt-y-lbl').lastChild.textContent=this.value;renderCanvas()">
+        </div>
+      </div>
+      <div style="margin-top:6px">
+        <label class="lbl" id="gt-rot-lbl">Rotation <span style="color:var(--text2)">-15&deg;</span></label>
+        <input type="range" min="-45" max="45" value="-15" id="gt-rot" style="width:100%" oninput="S.ghostRotation=parseInt(this.value);document.getElementById('gt-rot-lbl').lastChild.textContent=this.value+'\u00b0';renderCanvas()">
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <div style="flex:1">
+          <label class="lbl">Ghost font</label>
+          <select class="theme-sel" id="gt-font" style="width:100%" onchange="S.ghostFont=this.value;renderCanvas()">
+            <option value="">Default</option>
+            <option value="Bebas Neue">Bebas Neue</option>
+            <option value="Syne">Syne</option>
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Outfit">Outfit</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Colour</label>
+          <input type="color" id="gt-color" value="#c76a25" style="width:40px;height:28px;border:1px solid var(--border2);border-radius:4px;background:none;cursor:pointer;padding:1px" oninput="S.ghostColor=this.value;renderCanvas()">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -764,6 +813,15 @@ let S = {
   showFooter:true,
   showSwipe:true,
   postMode:'carousel',
+  bgOpacity:40,
+  ghostText:'',
+  ghostSize:120,
+  ghostOpacity:10,
+  ghostX:0,
+  ghostY:0,
+  ghostRotation:-15,
+  ghostFont:'',
+  ghostColor:'',
   hashtagSets:[
     {name:'Tech Founder',tags:'#CTOLife #FounderJourney #TechLeadership #MelbourneTech #AIAutomation'},
     {name:'Content Creator',tags:'#LinkedInTips #ContentCreation #PersonalBrand #ThoughtLeadership'},
@@ -1020,27 +1078,40 @@ function initBrandKitUI() {
 function getBG(bgStyle,themeKey) {
   const t=THEMES[themeKey], a=t.accent;
   const light=LIGHT_THEMES.includes(themeKey);
-  const op=light?0.06:0.13, lo=light?0.04:0.07;
+  const op=light?0.12:0.22, lo=light?0.08:0.14;
+  const svgWrap=(inner)=>`<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="opacity:${(S.bgOpacity||40)/100}">${inner}</svg>`;
 
-  if(bgStyle==='grid') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="g" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0L0 0 0 28" fill="none" stroke="${a}" stroke-width="0.4" opacity="${lo*1.8}"/></pattern></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`;
-  if(bgStyle==='dots') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="d" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="${a}" opacity="${op}"/></pattern></defs><rect width="100%" height="100%" fill="url(#d)"/></svg>`;
-  if(bgStyle==='diagonal') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="di" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="20" x2="20" y2="0" stroke="${a}" stroke-width="0.5" opacity="${lo}"/></pattern></defs><rect width="100%" height="100%" fill="url(#di)"/></svg>`;
-  if(bgStyle==='circles') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><circle cx="85%" cy="18%" r="26%" fill="none" stroke="${a}" stroke-width="0.8" opacity="${op}"/><circle cx="85%" cy="18%" r="16%" fill="none" stroke="${a}" stroke-width="0.5" opacity="${op}"/><circle cx="15%" cy="82%" r="20%" fill="none" stroke="${a}" stroke-width="0.6" opacity="${op*0.7}"/><circle cx="50%" cy="50%" r="44%" fill="none" stroke="${a}" stroke-width="0.3" opacity="${op*0.35}"/></svg>`;
+  if(bgStyle==='grid') return svgWrap(`<defs><pattern id="g" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0L0 0 0 28" fill="none" stroke="${a}" stroke-width="0.8" opacity="${lo*1.8}"/></pattern></defs><rect width="100%" height="100%" fill="url(#g)"/>`);
+  if(bgStyle==='dots') return svgWrap(`<defs><pattern id="d" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="${a}" opacity="${op}"/></pattern></defs><rect width="100%" height="100%" fill="url(#d)"/>`);
+  if(bgStyle==='diagonal') return svgWrap(`<defs><pattern id="di" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="20" x2="20" y2="0" stroke="${a}" stroke-width="1" opacity="${lo}"/></pattern></defs><rect width="100%" height="100%" fill="url(#di)"/>`);
+  if(bgStyle==='circles') return svgWrap(`<circle cx="85%" cy="18%" r="26%" fill="none" stroke="${a}" stroke-width="1.5" opacity="${op}"/><circle cx="85%" cy="18%" r="16%" fill="none" stroke="${a}" stroke-width="1" opacity="${op}"/><circle cx="15%" cy="82%" r="20%" fill="none" stroke="${a}" stroke-width="1.2" opacity="${op*0.7}"/><circle cx="50%" cy="50%" r="44%" fill="none" stroke="${a}" stroke-width="0.5" opacity="${op*0.35}"/>`);
+  if(bgStyle==='hexagon') return svgWrap(`<defs><pattern id="hex" width="28" height="32" patternUnits="userSpaceOnUse"><polygon points="14,2 26,9 26,23 14,30 2,23 2,9" fill="none" stroke="${a}" stroke-width="0.8" opacity="${lo}"/></pattern></defs><rect width="100%" height="100%" fill="url(#hex)"/>`);
+  if(bgStyle==='cross') return svgWrap(`<defs><pattern id="cross" width="24" height="24" patternUnits="userSpaceOnUse"><line x1="12" y1="4" x2="12" y2="20" stroke="${a}" stroke-width="0.6" opacity="${lo}"/><line x1="4" y1="12" x2="20" y2="12" stroke="${a}" stroke-width="0.6" opacity="${lo}"/></pattern></defs><rect width="100%" height="100%" fill="url(#cross)"/>`);
+  if(bgStyle==='ghost-text') {
+    const gt=S.ghostText||S.tag||'YOUR BRAND';
+    const gs=S.ghostSize||120;
+    const go=S.ghostOpacity||10;
+    const gx=S.ghostX||0, gy=S.ghostY||0;
+    const gr=S.ghostRotation||-15;
+    const gf=S.ghostFont||'inherit';
+    const gc=S.ghostColor||a;
+    return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="'${gf}',sans-serif" font-size="${gs}" font-weight="900" fill="${gc}" opacity="${go/100}" transform="translate(${gx}, ${gy}) rotate(${gr}, 230, 230)" style="user-select:none">${gt}</text></svg>`;
+  }
   if(bgStyle==='gradient') {
     const o=(GS.opacity/100).toFixed(2);
-    if(GS.dir==='radial') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="rg1" cx="85%" cy="15%" r="55%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient><radialGradient id="rg2" cx="15%" cy="85%" r="40%"><stop offset="0%" stop-color="${GS.c2}" stop-opacity="${(GS.opacity/200).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c2}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#rg1)"/><rect width="100%" height="100%" fill="url(#rg2)"/></svg>`;
-    return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="50%" stop-color="${GS.c2}" stop-opacity="${(GS.opacity/150).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c3}" stop-opacity="${o}"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#lg)"/></svg>`;
+    if(GS.dir==='radial') return svgWrap(`<defs><radialGradient id="rg1" cx="85%" cy="15%" r="55%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient><radialGradient id="rg2" cx="15%" cy="85%" r="40%"><stop offset="0%" stop-color="${GS.c2}" stop-opacity="${(GS.opacity/200).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c2}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#rg1)"/><rect width="100%" height="100%" fill="url(#rg2)"/>`);
+    return svgWrap(`<defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="50%" stop-color="${GS.c2}" stop-opacity="${(GS.opacity/150).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c3}" stop-opacity="${o}"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#lg)"/>`);
   }
   if(bgStyle==='glow') {
     const o=(GS.opacity/100).toFixed(2);
-    return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="gl" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="55%" stop-color="${GS.c1}" stop-opacity="${(GS.opacity/300).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#gl)"/></svg>`;
+    return svgWrap(`<defs><radialGradient id="gl" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o}"/><stop offset="55%" stop-color="${GS.c1}" stop-opacity="${(GS.opacity/300).toFixed(2)}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#gl)"/>`);
   }
   if(bgStyle==='multi-glow') {
     const o1=(GS.opacity/100).toFixed(2),o2=(GS.opacity/160).toFixed(2),o3=(GS.opacity/220).toFixed(2);
-    return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="mg1" cx="80%" cy="18%" r="45%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o1}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient><radialGradient id="mg2" cx="20%" cy="82%" r="38%"><stop offset="0%" stop-color="${GS.c2}" stop-opacity="${o2}"/><stop offset="100%" stop-color="${GS.c2}" stop-opacity="0"/></radialGradient><radialGradient id="mg3" cx="60%" cy="55%" r="30%"><stop offset="0%" stop-color="${GS.c3}" stop-opacity="${o3}"/><stop offset="100%" stop-color="${GS.c3}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#mg1)"/><rect width="100%" height="100%" fill="url(#mg2)"/><rect width="100%" height="100%" fill="url(#mg3)"/></svg>`;
+    return svgWrap(`<defs><radialGradient id="mg1" cx="80%" cy="18%" r="45%"><stop offset="0%" stop-color="${GS.c1}" stop-opacity="${o1}"/><stop offset="100%" stop-color="${GS.c1}" stop-opacity="0"/></radialGradient><radialGradient id="mg2" cx="20%" cy="82%" r="38%"><stop offset="0%" stop-color="${GS.c2}" stop-opacity="${o2}"/><stop offset="100%" stop-color="${GS.c2}" stop-opacity="0"/></radialGradient><radialGradient id="mg3" cx="60%" cy="55%" r="30%"><stop offset="0%" stop-color="${GS.c3}" stop-opacity="${o3}"/><stop offset="100%" stop-color="${GS.c3}" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#mg1)"/><rect width="100%" height="100%" fill="url(#mg2)"/><rect width="100%" height="100%" fill="url(#mg3)"/>`);
   }
-  if(bgStyle==='noise') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)" opacity="0.05"/></svg>`;
-  if(bgStyle==='shapes3d') return `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><g opacity="${op}" transform="translate(310,20) scale(0.85)"><polygon points="70,0 140,35 140,105 70,70" fill="${a}" opacity="0.35"/><polygon points="0,35 70,0 70,70 0,105" fill="${a}" opacity="0.2"/><polygon points="0,105 70,70 140,105 70,140" fill="${a}" opacity="0.12"/><polygon points="70,0 140,35 70,70 0,35" fill="${a}" opacity="0.45"/></g><g opacity="${op*0.9}" transform="translate(-20,300) scale(0.75)"><circle cx="90" cy="90" r="80" fill="none" stroke="${a}" stroke-width="1.2"/><ellipse cx="90" cy="90" rx="80" ry="28" fill="none" stroke="${a}" stroke-width="0.7"/><ellipse cx="90" cy="90" rx="28" ry="80" fill="none" stroke="${a}" stroke-width="0.7"/></g><g opacity="${op*0.65}" transform="translate(360,195)"><ellipse cx="0" cy="0" rx="50" ry="22" fill="none" stroke="${a}" stroke-width="1.3"/><ellipse cx="0" cy="9" rx="38" ry="15" fill="none" stroke="${a}" stroke-width="0.6"/></g><g opacity="${op*0.45}" transform="translate(350,340) scale(0.8)"><polygon points="55,0 110,95 0,95" fill="none" stroke="${a}" stroke-width="1.1"/><polygon points="55,22 88,76 22,76" fill="none" stroke="${a}" stroke-width="0.5"/></g><g opacity="${op*0.55}"><circle cx="28" cy="38" r="3.5" fill="${a}"/><circle cx="50" cy="22" r="2.5" fill="${a}"/><circle cx="18" cy="62" r="2" fill="${a}"/><circle cx="68" cy="44" r="1.5" fill="${a}"/><circle cx="40" cy="80" r="1.5" fill="${a}"/></g></svg>`;
+  if(bgStyle==='noise') return svgWrap(`<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)" opacity="0.05"/>`);
+  if(bgStyle==='shapes3d') return svgWrap(`<g opacity="${op}" transform="translate(310,20) scale(0.85)"><polygon points="70,0 140,35 140,105 70,70" fill="${a}" opacity="0.35"/><polygon points="0,35 70,0 70,70 0,105" fill="${a}" opacity="0.2"/><polygon points="0,105 70,70 140,105 70,140" fill="${a}" opacity="0.12"/><polygon points="70,0 140,35 70,70 0,35" fill="${a}" opacity="0.45"/></g><g opacity="${op*0.9}" transform="translate(-20,300) scale(0.75)"><circle cx="90" cy="90" r="80" fill="none" stroke="${a}" stroke-width="1.2"/><ellipse cx="90" cy="90" rx="80" ry="28" fill="none" stroke="${a}" stroke-width="0.7"/><ellipse cx="90" cy="90" rx="28" ry="80" fill="none" stroke="${a}" stroke-width="0.7"/></g><g opacity="${op*0.65}" transform="translate(360,195)"><ellipse cx="0" cy="0" rx="50" ry="22" fill="none" stroke="${a}" stroke-width="1.3"/><ellipse cx="0" cy="9" rx="38" ry="15" fill="none" stroke="${a}" stroke-width="0.6"/></g><g opacity="${op*0.45}" transform="translate(350,340) scale(0.8)"><polygon points="55,0 110,95 0,95" fill="none" stroke="${a}" stroke-width="1.1"/><polygon points="55,22 88,76 22,76" fill="none" stroke="${a}" stroke-width="0.5"/></g><g opacity="${op*0.55}"><circle cx="28" cy="38" r="3.5" fill="${a}"/><circle cx="50" cy="22" r="2.5" fill="${a}"/><circle cx="18" cy="62" r="2" fill="${a}"/><circle cx="68" cy="44" r="1.5" fill="${a}"/><circle cx="40" cy="80" r="1.5" fill="${a}"/></g>`);
   return '';
 }
 
@@ -2026,7 +2097,7 @@ function initThemeGrid() {
   sh.onclick=()=>{S.theme=TKEYS[Math.floor(Math.random()*TKEYS.length)];initThemeGrid();renderAll();toast('Theme shuffled!');};
   g.appendChild(sh);
 }
-function setBg(el){S.bg=el.dataset.bg;document.querySelectorAll('.pill[data-bg]').forEach(p=>p.classList.remove('on'));el.classList.add('on');renderCanvas();}
+function setBg(el){S.bg=el.dataset.bg;document.querySelectorAll('.pill[data-bg]').forEach(p=>p.classList.remove('on'));el.classList.add('on');const gtc=document.getElementById('ghost-text-controls');if(gtc)gtc.style.display=S.bg==='ghost-text'?'block':'none';renderCanvas();}
 function setFont(el){S.font=el.dataset.font;document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('on'));el.classList.add('on');renderCanvas();toast('Font: '+S.font);}
 
 // ==================== BLOCK & SLIDE MANAGEMENT ====================
@@ -2243,6 +2314,18 @@ function syncProfileUI() {
   document.getElementById('f-show-footer').checked=S.showFooter!==false;
   document.getElementById('f-show-swipe').checked=S.showSwipe!==false;
   applyPostMode();
+  // Sync bg controls
+  const bgs=document.getElementById('bgop-slider');if(bgs){bgs.value=S.bgOpacity||40;document.getElementById('bgop-lbl').lastChild.textContent=(S.bgOpacity||40)+'%';}
+  document.querySelectorAll('.pill[data-bg]').forEach(p=>p.classList.toggle('on',p.dataset.bg===S.bg));
+  const gtc=document.getElementById('ghost-text-controls');if(gtc)gtc.style.display=S.bg==='ghost-text'?'block':'none';
+  const gtt=document.getElementById('gt-text');if(gtt)gtt.value=S.ghostText||'';
+  const gts=document.getElementById('gt-size');if(gts){gts.value=S.ghostSize||120;document.getElementById('gt-size-lbl').lastChild.textContent=(S.ghostSize||120)+'px';}
+  const gto=document.getElementById('gt-op');if(gto){gto.value=S.ghostOpacity||10;document.getElementById('gt-op-lbl').lastChild.textContent=(S.ghostOpacity||10)+'%';}
+  const gtx=document.getElementById('gt-x');if(gtx){gtx.value=S.ghostX||0;document.getElementById('gt-x-lbl').lastChild.textContent=S.ghostX||0;}
+  const gty=document.getElementById('gt-y');if(gty){gty.value=S.ghostY||0;document.getElementById('gt-y-lbl').lastChild.textContent=S.ghostY||0;}
+  const gtr=document.getElementById('gt-rot');if(gtr){gtr.value=S.ghostRotation!=null?S.ghostRotation:-15;document.getElementById('gt-rot-lbl').lastChild.textContent=(S.ghostRotation!=null?S.ghostRotation:-15)+'\u00b0';}
+  const gtf=document.getElementById('gt-font');if(gtf)gtf.value=S.ghostFont||'';
+  const gtcl=document.getElementById('gt-color');if(gtcl)gtcl.value=S.ghostColor||'#c76a25';
 }
 
 // ==================== DRAFT MANAGEMENT ====================
