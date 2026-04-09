@@ -1454,7 +1454,7 @@ function renderFields() {
   Object.keys(BLOCK_LABELS).forEach(k=>{addOpts+=`<option value="${k}">${BLOCK_LABELS[k]}</option>`;});
 
   const isSingle=S.postMode==='single';
-  const tplEntries=Object.entries(SLIDE_TEMPLATES).filter(([k,v])=>isSingle?v.singlePost:!v.singlePost);
+  const tplEntries=Object.entries(SLIDE_TEMPLATES);
 
   document.getElementById('sfields').innerHTML=`
     <div class="psec">
