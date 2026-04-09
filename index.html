@@ -1707,58 +1707,67 @@ function capInsert(text) {
   updateCapPreview();
 }
 
-function capFormat(type) {
-  const ta = document.getElementById('cap-text');
-  if (!ta) return;
-  ta.focus();
-  const start = ta.selectionStart, end = ta.selectionEnd;
-  const selected = ta.value.substring(start, end);
-  if (!selected) return;
-  let replacement;
-  if (type === 'bold') {
-    replacement = isBoldUnicode(selected) ? fromBoldUnicode(selected) : toBoldUnicode(selected);
-  } else {
-    replacement = isItalicUnicode(selected) ? fromItalicUnicode(selected) : toItalicUnicode(selected);
+// Unicode formatting: plain ↔ bold ↔ italic ↔ bold-italic
+// Ranges: Bold 0x1D400, Italic 0x1D434, BoldItalic 0x1D468
+function uniCharState(c) {
+  const cp=c.codePointAt(0);
+  if((cp>=0x1D468&&cp<=0x1D481)||(cp>=0x1D482&&cp<=0x1D49B)) return 'bi';
+  if((cp>=0x1D400&&cp<=0x1D419)||(cp>=0x1D41A&&cp<=0x1D433)||(cp>=0x1D7CE&&cp<=0x1D7D7)) return 'b';
+  if((cp>=0x1D434&&cp<=0x1D44D)||(cp>=0x1D44E&&cp<=0x1D467)||cp===0x210E) return 'i';
+  return 'p';
+}
+function uniToPlain(c) {
+  const cp=c.codePointAt(0);
+  if(cp>=0x1D468&&cp<=0x1D481) return String.fromCharCode(65+cp-0x1D468);
+  if(cp>=0x1D482&&cp<=0x1D49B) return String.fromCharCode(97+cp-0x1D482);
+  if(cp>=0x1D400&&cp<=0x1D419) return String.fromCharCode(65+cp-0x1D400);
+  if(cp>=0x1D41A&&cp<=0x1D433) return String.fromCharCode(97+cp-0x1D41A);
+  if(cp>=0x1D7CE&&cp<=0x1D7D7) return String.fromCharCode(48+cp-0x1D7CE);
+  if(cp>=0x1D434&&cp<=0x1D44D) return String.fromCharCode(65+cp-0x1D434);
+  if(cp>=0x1D44E&&cp<=0x1D467) return String.fromCharCode(97+cp-0x1D44E);
+  if(cp===0x210E) return 'h';
+  return c;
+}
+function uniApply(c,target) {
+  const p=uniToPlain(c);const pc=p.charCodeAt(0);
+  if(target==='b') {
+    if(pc>=65&&pc<=90) return String.fromCodePoint(0x1D400+pc-65);
+    if(pc>=97&&pc<=122) return String.fromCodePoint(0x1D41A+pc-97);
+    if(pc>=48&&pc<=57) return String.fromCodePoint(0x1D7CE+pc-48);
+  } else if(target==='i') {
+    if(pc>=65&&pc<=90) return String.fromCodePoint(0x1D434+pc-65);
+    if(pc>=97&&pc<=122) return pc===104?String.fromCodePoint(0x210E):String.fromCodePoint(0x1D44E+pc-97);
+  } else if(target==='bi') {
+    if(pc>=65&&pc<=90) return String.fromCodePoint(0x1D468+pc-65);
+    if(pc>=97&&pc<=122) return String.fromCodePoint(0x1D482+pc-97);
   }
-  ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
-  ta.selectionStart = start;
-  ta.selectionEnd = start + replacement.length;
-  S.caption = ta.value;
+  return target==='p'?p:c;
+}
+// Toggle bold: p→b, b→p, i→bi, bi→i
+// Toggle italic: p→i, i→p, b→bi, bi→b
+function capFormat(type) {
+  const ta=document.getElementById('cap-text');
+  if(!ta) return;
+  ta.focus();
+  const start=ta.selectionStart,end=ta.selectionEnd;
+  const selected=ta.value.substring(start,end);
+  if(!selected) return;
+  const transitions=type==='bold'?{p:'b',b:'p',i:'bi',bi:'i'}:{p:'i',i:'p',b:'bi',bi:'b'};
+  const replacement=[...selected].map(c=>{
+    const st=uniCharState(c);
+    const newSt=transitions[st]||st;
+    return newSt===st?c:uniApply(c,newSt);
+  }).join('');
+  ta.value=ta.value.substring(0,start)+replacement+ta.value.substring(end);
+  ta.selectionStart=start;
+  ta.selectionEnd=start+replacement.length;
+  S.caption=ta.value;
   updateCapCounter();
   updateCapPreview();
 }
-
-function toBoldUnicode(str) {
-  const m={};
-  for(let i=0;i<26;i++){m[String.fromCharCode(65+i)]=String.fromCodePoint(0x1D400+i);m[String.fromCharCode(97+i)]=String.fromCodePoint(0x1D41A+i);}
-  for(let i=0;i<10;i++){m[String.fromCharCode(48+i)]=String.fromCodePoint(0x1D7CE+i);}
-  return [...str].map(c=>m[c]||c).join('');
-}
-function fromBoldUnicode(str) {
-  const m={};
-  for(let i=0;i<26;i++){m[String.fromCodePoint(0x1D400+i)]=String.fromCharCode(65+i);m[String.fromCodePoint(0x1D41A+i)]=String.fromCharCode(97+i);}
-  for(let i=0;i<10;i++){m[String.fromCodePoint(0x1D7CE+i)]=String.fromCharCode(48+i);}
-  return [...str].map(c=>m[c]||c).join('');
-}
-function isBoldUnicode(str) {
-  return [...str].some(c=>{const cp=c.codePointAt(0);return(cp>=0x1D400&&cp<=0x1D419)||(cp>=0x1D41A&&cp<=0x1D433)||(cp>=0x1D7CE&&cp<=0x1D7D7);});
-}
-
-function toItalicUnicode(str) {
-  const m={};
-  for(let i=0;i<26;i++){m[String.fromCharCode(65+i)]=String.fromCodePoint(0x1D434+i);m[String.fromCharCode(97+i)]=String.fromCodePoint(0x1D44E+i);}
-  m['h']=String.fromCodePoint(0x210E);
-  return [...str].map(c=>m[c]||c).join('');
-}
-function fromItalicUnicode(str) {
-  const m={};
-  for(let i=0;i<26;i++){m[String.fromCodePoint(0x1D434+i)]=String.fromCharCode(65+i);m[String.fromCodePoint(0x1D44E+i)]=String.fromCharCode(97+i);}
-  m[String.fromCodePoint(0x210E)]='h';
-  return [...str].map(c=>m[c]||c).join('');
-}
-function isItalicUnicode(str) {
-  return [...str].some(c=>{const cp=c.codePointAt(0);return(cp>=0x1D434&&cp<=0x1D44D)||(cp>=0x1D44E&&cp<=0x1D467)||cp===0x210E;});
-}
+// Standalone converters (used by other functions)
+function toBoldUnicode(str){return [...str].map(c=>uniApply(c,'b')).join('');}
+function toItalicUnicode(str){return [...str].map(c=>uniApply(c,'i')).join('');}
 
 function generateCaption() {
   const ta = document.getElementById('cap-text');
