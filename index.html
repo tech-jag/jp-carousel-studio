@@ -544,10 +544,12 @@ const LIGHT_THEMES = ['warm-cream','chalk','linen-tutorial','linen-minimal','saf
 
 // ==================== FONTS ====================
 const FSIZES = {
-  'Playfair Display':'clamp(22px,4vw,34px)','Fraunces':'clamp(22px,4vw,34px)','Bebas Neue':'clamp(36px,6vw,52px)',
-  'Syne':'clamp(24px,4.5vw,38px)','Outfit':'clamp(22px,4vw,34px)','DM Serif Display':'clamp(22px,4vw,36px)',
-  'Inter':'clamp(20px,3.8vw,32px)','Space Grotesk':'clamp(20px,3.8vw,30px)'
+  'Playfair Display':'clamp(28px,5.5vw,44px)','Fraunces':'clamp(28px,5.5vw,44px)','Bebas Neue':'clamp(44px,8vw,64px)',
+  'Syne':'clamp(30px,5.5vw,46px)','Outfit':'clamp(28px,5.5vw,42px)','DM Serif Display':'clamp(28px,5.5vw,44px)',
+  'Inter':'clamp(26px,5vw,40px)','Space Grotesk':'clamp(26px,5vw,38px)'
 };
+const HL_SIZES = {auto:1, xl:1.2, xxl:1.4, fill:1.8};
+const HL_SPACING = {normal:'0', tight:'-0.02em', wide:'0.05em'};
 
 // ==================== BLOCK TYPES ====================
 const BLOCK_LABELS = {
@@ -951,7 +953,11 @@ function buildSlide(slide,idx,total,font) {
   const themeKey=slide.themeOverride||S.theme;
   const t=THEMES[themeKey];
   const A=t.accent,TX=t.text,T2=t.text2,T3=t.text3,FB=t.ftrB;
-  const ff=`'${font}',serif`, fs=FSIZES[font]||'clamp(22px,4vw,34px)';
+  const ff=`'${font}',serif`, baseFs=FSIZES[font]||'clamp(28px,5.5vw,44px)';
+  const hlMult=HL_SIZES[slide.hlSize||'auto']||1;
+  const hlLs=HL_SPACING[slide.letterSpacing||'normal']||'0';
+  const fs=hlMult===1?baseFs:`calc(${baseFs} * ${hlMult})`;
+  const lh=hlMult>=1.4?0.95:hlMult>=1.2?0.98:1.0;
   const mono="'JetBrains Mono',monospace";
   const bgSVG=getBG(S.bg,themeKey);
   const hlHTML=hl(slide.headline||'',slide.accent||'',A,font);
@@ -972,8 +978,8 @@ function buildSlide(slide,idx,total,font) {
   // Headline style (tech-dark uses gradient)
   const hlClass=isTechDark?'class="hl-gradient"':'';
   const hlStyle=isTechDark
-    ?`font-family:${ff};font-size:${fs};font-weight:900;line-height:1.06;background:linear-gradient(135deg,#ff9a5c,#ff5520);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px`
-    :`font-family:${ff};font-size:${fs};font-weight:900;line-height:1.06;color:${TX};margin-bottom:8px`;
+    ?`font-family:${ff};font-size:${fs};font-weight:900;line-height:${lh};letter-spacing:${hlLs};background:linear-gradient(135deg,#ff9a5c,#ff5520);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px`
+    :`font-family:${ff};font-size:${fs};font-weight:900;line-height:${lh};letter-spacing:${hlLs};color:${TX};margin-bottom:8px`;
 
   // Render blocks
   const blocksHTML=slide.blocks.map(b=>renderBlock(b,t,font,themeKey)).join('');
@@ -1094,6 +1100,25 @@ function renderFields() {
       <input class="fi" value="${esc(s.headline||'')}" oninput="updSlide(${si},'headline',this.value)">
       <label class="lbl">Accent word (italic)</label>
       <input class="fi" value="${esc(s.accent||'')}" placeholder="word in accent colour" oninput="updSlide(${si},'accent',this.value)">
+      <div class="frow" style="margin-bottom:8px">
+        <div>
+          <label class="lbl">Headline size</label>
+          <select class="theme-sel" onchange="updSlide(${si},'hlSize',this.value)" style="width:100%">
+            <option value="auto"${(s.hlSize||'auto')==='auto'?' selected':''}>Auto</option>
+            <option value="xl"${s.hlSize==='xl'?' selected':''}>XL (+20%)</option>
+            <option value="xxl"${s.hlSize==='xxl'?' selected':''}>XXL (+40%)</option>
+            <option value="fill"${s.hlSize==='fill'?' selected':''}>Fill (+80%)</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Letter spacing</label>
+          <select class="theme-sel" onchange="updSlide(${si},'letterSpacing',this.value)" style="width:100%">
+            <option value="normal"${(s.letterSpacing||'normal')==='normal'?' selected':''}>Normal</option>
+            <option value="tight"${s.letterSpacing==='tight'?' selected':''}>Tight</option>
+            <option value="wide"${s.letterSpacing==='wide'?' selected':''}>Wide</option>
+          </select>
+        </div>
+      </div>
       <div style="margin-top:8px">${blocksHTML}</div>
       <select class="add-blk" onchange="if(this.value){addBlockToSlide(${si},this.value);this.selectedIndex=0;}">${addOpts}</select>
     </div>`;
@@ -1444,7 +1469,7 @@ function moveBlock(si,bi,dir) {
 
 function addSlide() {
   if(S.slides.length>=12){toast('Max 12 slides',true);return;}
-  S.slides.push({headline:'New slide.',accent:'slide.',themeOverride:null,blocks:[{type:'sub-text',text:'Add your content here.',bold:''}]});
+  S.slides.push({headline:'New slide.',accent:'slide.',themeOverride:null,hlSize:'auto',letterSpacing:'normal',blocks:[{type:'sub-text',text:'Add your content here.',bold:''}]});
   S.cur=S.slides.length-1;renderAll();toast('Slide added');
 }
 function removeSlide() {
